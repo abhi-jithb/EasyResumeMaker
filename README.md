@@ -1,8 +1,8 @@
 # EasyResume Maker 🚀
-
 > **Paste your portfolio link. Get a professional PDF resume. Instantly.**
+<img width="883" height="484" alt="sc" src="https://github.com/user-attachments/assets/b9a41121-78c4-48b1-856f-12c57b25c2f6" />
 
-EasyResume Maker is a zero-friction, AI-powered resume generator. 
+*EasyResume Maker* is a zero-friction, AI-powered resume generator. 
 Paste any public URL — portfolio site, GitHub profile, LinkedIn, Dev.to, 
 or personal blog — and get a clean, downloadable PDF resume in seconds.
 
