@@ -2164,6 +2164,11 @@ ${rawText}`;
 
       const fname = (d.name || 'resume').toLowerCase().replace(/\s+/g, '-');
       doc.save(`${fname}-${tpl}-resume.pdf`);
+
+      // Automatically show feedback modal after download
+      setTimeout(() => {
+        if (typeof toggleFeedback === 'function') toggleFeedback();
+      }, 1500);
     }
 
     // ===== UTILS =====
