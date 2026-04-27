@@ -1624,31 +1624,58 @@
       setStage('stage-parse', 'active', 'extracting...');
       let parsed = null;
 
-      const systemPrompt = `You are an expert resume writer and information extractor. 
-Your task: analyze web page content and extract ONLY resume-relevant information that genuinely exists on the page.
-RULES: Never invent or hallucinate information. If a field is not found, leave it empty. 
-Return ONLY valid JSON — no markdown fences, no explanation, no preamble.`;
+      const systemPrompt = `You are an expert resume writer and data extractor. 
+Your task: Analyze web page content and extract ONLY resume-relevant information that genuinely exists on the page.
+RULES:
+- Return ONLY valid JSON.
+- Never invent, exaggerate, or hallucinate information. If info is insufficient, generate fewer bullet points.
+- Prioritize brevity over completeness to ensure the resume fits on a single page.
+- For experience, provide concise, action-oriented bullet points.
+- Skill Classification:
+  * "Languages": Programming languages only.
+  * "Tools": Frameworks, libraries, and technical tools.
+  * "Soft Skills": Interpersonal and leadership abilities.`;
 
-      const userPrompt = `Extract all resume information from this web page content and return a JSON object with exactly this structure:
+      const userPrompt = `Extract all resume information from this web page content and return a JSON object with EXACTLY this structure:
 
 {
   "name": "",
-  "title": "",
-  "email": "",
-  "phone": "",
-  "location": "",
-  "website": "${fullUrl}",
-  "summary": "",
-  "experience": [{"company":"","role":"","duration":"","description":""}],
-  "education": [{"institution":"","degree":"","year":""}],
-  "skills": [],
-  "projects": [{"name":"","description":"","tech":"","url":""}],
-  "links": {"github":"","linkedin":"","twitter":"","other":""}
+  "contact": {
+    "phone": "",
+    "email": "",
+    "location": "",
+    "links": []
+  },
+  "about": "",
+  "experience": [
+    {
+      "role": "",
+      "organization": "",
+      "location": "",
+      "duration": "",
+      "points": []
+    }
+  ],
+  "achievements": [],
+  "skills": {
+    "languages": [],
+    "tools": [],
+    "soft_skills": []
+  },
+  "languages_spoken": [],
+  "education": [
+    {
+      "degree": "",
+      "institution": "",
+      "duration": ""
+    }
+  ]
 }
 
-For "summary": write a 2–3 sentence professional summary in first person based on what you find. Keep it concise and impactful.
-For "skills": list individual skills as strings, max 20.
-For descriptions: write in clear, professional language. Use action verbs.
+- "about": 2–3 sentences max.
+- "points": Action-based bullet points.
+- "links": List of URLs (GitHub, LinkedIn, Portfolio).
+- "skills": Strictly group into categories.
 
 PAGE CONTENT:
 ${rawText}`;
@@ -1729,42 +1756,53 @@ ${rawText}`;
 
     // ===== RENDER PREVIEW =====
     function renderPreview(d) {
-      // Formatted preview
-      const skills = (d.skills || []).slice(0, 18).map(s => `<span class="rf-skill">${esc(s)}</span>`).join('');
-      const exp = (d.experience || []).filter(e => e.role || e.company).map(e => `
-    <div class="rf-item-title">${esc(e.role)}${e.company ? ' · ' + esc(e.company) : ''}</div>
-    ${e.duration ? `<div class="rf-item-sub">${esc(e.duration)}</div>` : ''}
-    ${e.description ? `<div class="rf-item-desc">${esc(e.description)}</div>` : ''}
-  `).join('');
-      const edu = (d.education || []).filter(e => e.degree || e.institution).map(e => `
-    <div class="rf-item-title">${esc(e.degree || '')}${e.institution ? ' · ' + esc(e.institution) : ''}</div>
-    ${e.year ? `<div class="rf-item-sub">${esc(e.year)}</div>` : ''}
-  `).join('');
-      const proj = (d.projects || []).filter(p => p.name).map(p => `
-    <div class="rf-item-title">${esc(p.name)}</div>
-    ${p.tech ? `<div class="rf-item-sub">${esc(p.tech)}</div>` : ''}
-    ${p.description ? `<div class="rf-item-desc">${esc(p.description)}</div>` : ''}
-  `).join('');
-      const contactParts = [d.email, d.phone, d.location, d.website].filter(Boolean);
-      const contactMarkup = contactParts.map(c => `<span>${esc(c)}</span>`).join('');
+      // Experience markup
+      const exp = (d.experience || []).filter(e => e.role || e.organization).map(e => `
+        <div class="rf-item-title">${esc(e.role)}${e.organization ? ' · ' + esc(e.organization) : ''}</div>
+        ${e.duration || e.location ? `<div class="rf-item-sub">${esc(e.duration)}${e.duration && e.location ? ' — ' : ''}${esc(e.location)}</div>` : ''}
+        <ul class="rf-item-desc" style="padding-left: 1.2rem; margin-top: 4px;">
+          ${(e.points || []).map(p => `<li>${esc(p)}</li>`).join('')}
+        </ul>
+      `).join('');
+
+      // Skills markup
+      const sk = d.skills || {};
+      const skillsMarkup = `
+        ${sk.languages?.length ? `<div style="margin-bottom:8px"><strong>Languages:</strong> ${sk.languages.map(esc).join(', ')}</div>` : ''}
+        ${sk.tools?.length ? `<div style="margin-bottom:8px"><strong>Tools:</strong> ${sk.tools.map(esc).join(', ')}</div>` : ''}
+        ${sk.soft_skills?.length ? `<div><strong>Soft Skills:</strong> ${sk.soft_skills.map(esc).join(', ')}</div>` : ''}
+      `;
+
+      // Contact markup
+      const c = d.contact || {};
+      const contactParts = [c.phone, c.email, c.location, ...(c.links || [])].filter(Boolean);
+      const contactMarkup = contactParts.map(cp => `<span>${esc(cp)}</span>`).join('');
 
       document.getElementById('resume-formatted-view').innerHTML = `
-    <div class="resume-formatted">
-      <div class="rf-name">${esc(d.name || 'Your Name')}</div>
-      <div class="rf-title">${esc(d.title || '')}</div>
-      <div class="rf-contact">${contactMarkup}</div>
-      ${d.summary ? `<div class="rf-section">About</div><div class="rf-item-desc" style="font-style:italic; opacity:0.8">${esc(d.summary)}</div>` : ''}
-      ${exp ? `<div class="rf-section">Experience</div>${exp}` : ''}
-      ${proj ? `<div class="rf-section">Projects</div>${proj}` : ''}
-      ${edu ? `<div class="rf-section">Education</div>${edu}` : ''}
-      ${skills ? `<div class="rf-section">Skills</div><div class="rf-skills">${skills}</div>` : ''}
-      ${d.links && Object.values(d.links).some(Boolean) ? `
-        <div class="rf-section">Links</div>
-        <div class="rf-skills">
-          ${Object.entries(d.links).filter(([k, v]) => v).map(([k, v]) => `<span class="rf-skill">${esc(k)}: ${esc(v)}</span>`).join('')}
-        </div>
-      `: ''}
-    </div>`;
+        <div class="resume-formatted">
+          <div class="rf-name">${esc(d.name || 'Your Name')}</div>
+          <div class="rf-contact">${contactMarkup}</div>
+          ${d.about ? `<div class="rf-section">About Me</div><div class="rf-item-desc">${esc(d.about)}</div>` : ''}
+          ${exp ? `<div class="rf-section">Experience</div>${exp}` : ''}
+          ${d.achievements?.length ? `
+            <div class="rf-section">Achievements</div>
+            <ul class="rf-item-desc" style="padding-left: 1.2rem;">
+              ${d.achievements.map(a => `<li>${esc(a)}</li>`).join('')}
+            </ul>
+          ` : ''}
+          ${(sk.languages?.length || sk.tools?.length || sk.soft_skills?.length) ? `<div class="rf-section">Technical Skills</div><div class="rf-item-desc">${skillsMarkup}</div>` : ''}
+          ${d.languages_spoken?.length ? `
+            <div class="rf-section">Languages</div>
+            <div class="rf-item-desc">${d.languages_spoken.map(esc).join('  —  ')}</div>
+          ` : ''}
+          ${(d.education || []).length ? `
+            <div class="rf-section">Education</div>
+            ${d.education.map(ed => `
+              <div class="rf-item-title">${esc(ed.degree)}</div>
+              <div class="rf-item-sub">${esc(ed.institution)} ${ed.duration ? ' — ' + esc(ed.duration) : ''}</div>
+            `).join('')}
+          ` : ''}
+        </div>`;
 
       // JSON preview
       document.getElementById('resume-json-view').textContent = JSON.stringify(d, null, 2);
@@ -1781,117 +1819,100 @@ ${rawText}`;
       const lm = 20, rm = 190, pw = rm - lm;
       let y = 20;
 
-      // ── Template: MINIMAL ──
+      // ── Template: MINIMAL (Matches Reference Image) ──
       if (tpl === 'minimal') {
+        // Header
         doc.setFont('times', 'bold');
-        doc.setFontSize(22);
-        doc.setTextColor(10, 10, 10);
-        doc.text(d.name || 'Your Name', lm, y); y += 11;
+        doc.setFontSize(24);
+        doc.setTextColor(20, 20, 20);
+        const nameLines = doc.splitTextToSize(d.name || 'Your Name', pw);
+        doc.text(nameLines, lm + (pw / 2), y, { align: 'center' });
+        y += 8;
 
-        doc.setFont('times', 'italic');
-        doc.setFontSize(11);
-        doc.setTextColor(80, 80, 80);
-        doc.text(d.title || '', lm, y); y += 9;
-
-        const contact = [d.email, d.phone, d.location, d.website].filter(Boolean).join('  ·  ');
-        doc.setFont('courier', 'normal');
-        doc.setFontSize(8);
-        doc.setTextColor(110, 110, 110);
-        doc.text(contact, lm, y, { maxWidth: pw - 10 }); y += 12;
+        const c = d.contact || {};
+        const contact = [c.phone, c.email, c.location, ...(c.links || [])].filter(Boolean).join(' — ');
+        doc.setFont('times', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(60, 60, 60);
+        const cLines = doc.splitTextToSize(contact, pw);
+        doc.text(cLines, lm + (pw / 2), y, { align: 'center' });
+        y += 12;
 
         const sections = [
-          { title: 'About', content: d.summary ? [{ type: 'text', val: d.summary }] : [] },
-          { title: 'Experience', content: (d.experience || []).filter(e => e.role || e.company).map(e => ({ type: 'entry', val: e })) },
-          { title: 'Projects', content: (d.projects || []).filter(p => p.name).map(p => ({ type: 'project', val: p })) },
-          { title: 'Education', content: (d.education || []).filter(e => e.degree).map(e => ({ type: 'edu', val: e })) },
-          { title: 'Skills', content: d.skills?.length ? [{ type: 'skills', val: d.skills }] : [] },
-          { title: 'Links', content: d.links && Object.values(d.links).some(Boolean) ? [{ type: 'links', val: d.links }] : [] }
+          { id: 'about', title: 'About Me', content: d.about ? [{ type: 'text', val: d.about }] : [] },
+          { id: 'exp', title: 'Experience', content: (d.experience || []).map(e => ({ type: 'entry', val: e })) },
+          { id: 'ach', title: 'Achievements', content: d.achievements?.length ? [{ type: 'list', val: d.achievements }] : [] },
+          { id: 'skills', title: 'Technical Skills', content: (d.skills && (d.skills.languages?.length || d.skills.tools?.length || d.skills.soft_skills?.length)) ? [{ type: 'skills', val: d.skills }] : [] },
+          { id: 'langs', title: 'Languages', content: d.languages_spoken?.length ? [{ type: 'spoken', val: d.languages_spoken }] : [] },
+          { id: 'edu', title: 'Education', content: (d.education || []).map(e => ({ type: 'edu', val: e })) }
         ];
 
         sections.forEach(sec => {
           if (!sec.content.length) return;
-          if (y > 260) { doc.addPage(); y = 20; }
+          if (y > 265) { doc.addPage(); y = 20; }
+
+          // Section Title
           doc.setFont('helvetica', 'bold');
-          doc.setFontSize(9);
-          doc.setTextColor(130, 130, 130);
-          doc.text(sec.title.toUpperCase(), lm, y); y += 3;
-          doc.setDrawColor(200, 200, 200);
-          doc.setLineWidth(0.4);
-          doc.line(lm, y, rm, y); y += 8;
+          doc.setFontSize(10);
+          doc.setTextColor(30, 30, 30);
+          doc.text(sec.title.toUpperCase(), lm, y);
+          y += 2;
+          doc.setDrawColor(30,30,30); doc.setLineWidth(0.4); doc.line(lm, y, rm, y); 
+          y += 6;
 
           sec.content.forEach(item => {
-            if (y > 260) { doc.addPage(); y = 20; }
+            if (y > 270) { doc.addPage(); y = 20; }
+
             if (item.type === 'text') {
-              doc.setFont('times', 'italic');
-              doc.setFontSize(10.5);
-              doc.setTextColor(60, 60, 60);
+              doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(50, 50, 50);
               const lines = doc.splitTextToSize(item.val, pw);
-              doc.text(lines, lm, y); y += lines.length * 5 + 4;
+              doc.text(lines, lm, y); y += lines.length * 4.8 + 4;
             } else if (item.type === 'entry') {
               const e = item.val;
-              doc.setFont('helvetica', 'bold');
-              doc.setFontSize(11);
-              doc.setTextColor(15, 15, 15);
-              const header = (e.role || '') + (e.company ? ' · ' + e.company : '');
-              const hLines = doc.splitTextToSize(header, pw - 10);
-              doc.text(hLines, lm, y); y += hLines.length * 5.5 + 0.5;
-
-              if (e.duration) {
-                doc.setFont('helvetica', 'italic'); doc.setFontSize(9); doc.setTextColor(120, 120, 120);
-                doc.text(e.duration, lm, y); y += 5;
-              }
-              if (e.description) {
-                doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(60, 60, 60);
-                const ls = doc.splitTextToSize(e.description, pw - 10);
-                doc.text(ls, lm, y); y += ls.length * 4.8 + 5;
-              }
-            } else if (item.type === 'project') {
-              const p = item.val;
-              doc.setFont('helvetica', 'bold');
-              doc.setFontSize(11);
-              doc.setTextColor(15, 15, 15);
-              const hLines = doc.splitTextToSize(p.name || '', pw - 10);
-              doc.text(hLines, lm, y); y += hLines.length * 5.5 + 0.5;
-
-              if (p.tech) {
-                doc.setFont('courier', 'normal'); doc.setFontSize(8.5); doc.setTextColor(120, 120, 120);
-                doc.text(p.tech, lm, y, { maxWidth: pw - 10 }); y += 5;
-              }
-              if (p.description) {
-                doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(60, 60, 60);
-                const ls = doc.splitTextToSize(p.description, pw - 10);
-                doc.text(ls, lm, y); y += ls.length * 4.8 + 5;
-              }
+              doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5); doc.setTextColor(20, 20, 20);
+              doc.text(e.role || '', lm, y);
+              if (e.duration) { doc.setFont('times', 'italic'); doc.setFontSize(9); doc.text(e.duration, rm, y, { align: 'right' }); }
+              y += 5;
+              doc.setFont('times', 'italic'); doc.setFontSize(10); doc.setTextColor(80, 80, 80);
+              doc.text(e.organization || '', lm, y);
+              if (e.location) { doc.text(e.location, rm, y, { align: 'right' }); }
+              y += 5;
+              doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(50, 50, 50);
+              (e.points || []).forEach(p => {
+                const pLines = doc.splitTextToSize('• ' + p, pw - 5);
+                doc.text(pLines, lm, y); y += pLines.length * 4.5 + 1;
+              });
+              y += 3;
+            } else if (item.type === 'list') {
+              doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(50, 50, 50);
+              item.val.forEach(a => {
+                const aLines = doc.splitTextToSize('• ' + a, pw - 5);
+                doc.text(aLines, lm, y); y += aLines.length * 4.5 + 1;
+              });
+              y += 3;
+            } else if (item.type === 'skills') {
+              const s = item.val;
+              const drawSkill = (label, values) => {
+                if (!values?.length) return;
+                doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.text(label + ':', lm, y);
+                doc.setFont('helvetica', 'normal'); const valStr = values.join(', '); const vLines = doc.splitTextToSize(valStr, pw - 30);
+                doc.text(vLines, lm + 25, y); y += vLines.length * 4.5 + 1;
+              };
+              drawSkill('Languages', s.languages);
+              drawSkill('Tools', s.tools);
+              drawSkill('Soft Skills', s.soft_skills);
+              y += 2;
+            } else if (item.type === 'spoken') {
+              doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.text(item.val.join('  —  '), lm, y); y += 6;
             } else if (item.type === 'edu') {
               const e = item.val;
-              doc.setFont('helvetica', 'bold');
-              doc.setFontSize(11);
-              doc.setTextColor(15, 15, 15);
-              const header = (e.degree || '') + (e.institution ? ' · ' + e.institution : '');
-              const hLines = doc.splitTextToSize(header, pw - 10);
-              doc.text(hLines, lm, y); y += hLines.length * 5 + 0.5;
-
-              if (e.year) {
-                doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(120, 120, 120);
-                doc.text(e.year, lm, y); y += 5;
-              }
-            } else if (item.type === 'skills') {
-              doc.setFont('courier', 'normal');
-              doc.setFontSize(9);
-              doc.setTextColor(60, 60, 60);
-              const skillStr = item.val.join('  ·  ');
-              const ls = doc.splitTextToSize(skillStr, pw - 10);
-              doc.text(ls, lm, y); y += ls.length * 5 + 3;
-            } else if (item.type === 'links') {
-              doc.setFont('courier', 'normal');
-              doc.setFontSize(8.5);
-              doc.setTextColor(80, 80, 80);
-              const linkStr = Object.entries(item.val).filter(([k, v]) => v).map(([k, v]) => `${k}: ${v}`).join('  ·  ');
-              const ls = doc.splitTextToSize(linkStr, pw - 10);
-              doc.text(ls, lm, y); y += ls.length * 4.5 + 3;
+              doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5); doc.text(e.degree || '', lm, y);
+              if (e.duration) { doc.setFont('times', 'italic'); doc.setFontSize(9); doc.text(e.duration, rm, y, { align: 'right' }); }
+              y += 5;
+              doc.setFont('times', 'italic'); doc.setFontSize(10); doc.text(e.institution || '', lm, y); y += 6;
             }
           });
-          y += 2;
+          y += 4;
         });
 
         // ── Template: MODERN ──
@@ -1928,22 +1949,20 @@ ${rawText}`;
         };
 
         sbSection('Contact');
-        [d.email, d.phone, d.location, d.website].filter(Boolean).forEach(c => {
-          doc.setFont('courier', 'normal');
-          doc.setFontSize(7.5);
-          doc.setTextColor(160, 160, 180);
-          const ls = doc.splitTextToSize(c, sbW - 4);
+        const c = d.contact || {};
+        [c.phone, c.email, c.location, ...(c.links || [])].filter(Boolean).forEach(cp => {
+          doc.setFont('courier', 'normal'); doc.setFontSize(7.5); doc.setTextColor(160, 160, 180);
+          const ls = doc.splitTextToSize(cp, sbW - 4);
           doc.text(ls, lm, y); y += ls.length * 4 + 2;
         });
         y += 6;
 
-        if (d.skills?.length) {
+        const sk = d.skills || {};
+        if (sk.languages?.length || sk.tools?.length || sk.soft_skills?.length) {
           sbSection('Skills');
-          d.skills.slice(0, 16).forEach(sk => {
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(8.5);
-            doc.setTextColor(200, 200, 210);
-            doc.text('› ' + sk, lm, y); y += 5;
+          [...(sk.languages || []), ...(sk.tools || []), ...(sk.soft_skills || [])].slice(0, 20).forEach(s => {
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(200, 200, 210);
+            doc.text('› ' + s, lm, y); y += 5;
           });
         }
 
@@ -1974,78 +1993,43 @@ ${rawText}`;
           doc.line(mainX, my, rm, my); my += 8;
         };
 
-        if (d.summary) {
+        if (d.about) {
           mainSection('About');
-          doc.setFont('times', 'italic');
-          doc.setFontSize(10.5);
-          doc.setTextColor(50, 50, 50);
-          const ls = doc.splitTextToSize(d.summary, mainW);
+          doc.setFont('times', 'italic'); doc.setFontSize(10.5); doc.setTextColor(50, 50, 50);
+          const ls = doc.splitTextToSize(d.about, mainW);
           doc.text(ls, mainX, my); my += ls.length * 5 + 6;
         }
 
         const mainEntry = (items, type) => {
           items.forEach(item => {
-            if (my > 260) {
-              doc.addPage(); my = 20;
-              doc.setFillColor(17, 24, 39);
-              doc.rect(0, 0, lm + sbW, pageH, 'F');
-              // Optional: Re-draw sidebar divider if needed
-            }
+            if (my > 260) { doc.addPage(); my = 20; doc.setFillColor(17, 24, 39); doc.rect(0, 0, lm + sbW, pageH, 'F'); }
             if (type === 'exp') {
-              doc.setFont('helvetica', 'bold');
-              doc.setFontSize(11);
-              doc.setTextColor(20, 20, 20);
-              const header = (item.role || '') + (item.company ? ' · ' + item.company : '');
+              doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(20, 20, 20);
+              const header = (item.role || '') + (item.organization ? ' · ' + item.organization : '');
               const hLines = doc.splitTextToSize(header, mainW);
-              doc.text(hLines, mainX, my); my += hLines.length * 5.5 + 0.5;
-
-              if (item.duration) {
-                doc.setFont('helvetica', 'italic'); doc.setFontSize(9); doc.setTextColor(100, 100, 100);
-                doc.text(item.duration, mainX, my); my += 5;
-              }
-              if (item.description) {
-                doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(60, 60, 60);
-                const ls = doc.splitTextToSize(item.description, mainW);
-                doc.text(ls, mainX, my); my += ls.length * 4.8 + 5;
-              }
-            } else if (type === 'proj') {
-              doc.setFont('helvetica', 'bold');
-              doc.setFontSize(11);
-              doc.setTextColor(20, 20, 20);
-              const hLines = doc.splitTextToSize(item.name || '', mainW);
-              doc.text(hLines, mainX, my); my += hLines.length * 5.5 + 0.5;
-
-              if (item.tech) {
-                doc.setFont('courier', 'normal'); doc.setFontSize(8.5); doc.setTextColor(100, 100, 100);
-                const tLines = doc.splitTextToSize(item.tech, mainW);
-                doc.text(tLines, mainX, my); my += tLines.length * 4.5 + 1;
-              }
-              if (item.description) {
-                doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(60, 60, 60);
-                const ls = doc.splitTextToSize(item.description, mainW);
-                doc.text(ls, mainX, my); my += ls.length * 4.8 + 5;
-              }
+              doc.text(hLines, mainX, my); my += hLines.length * 5.5 + 1;
+              if (item.duration) { doc.setFont('helvetica', 'italic'); doc.setFontSize(9); doc.setTextColor(100, 100, 100); doc.text(item.duration, mainX, my); my += 5; }
+              doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(60, 60, 60);
+              (item.points || []).forEach(p => { const ls = doc.splitTextToSize('• ' + p, mainW); doc.text(ls, mainX, my); my += ls.length * 4.5 + 1; });
             } else if (type === 'edu') {
-              doc.setFont('helvetica', 'bold');
-              doc.setFontSize(11);
-              doc.setTextColor(20, 20, 20);
+              doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(20, 20, 20);
               const header = (item.degree || '') + (item.institution ? ' · ' + item.institution : '');
               const hLines = doc.splitTextToSize(header, mainW);
-              doc.text(hLines, mainX, my); my += hLines.length * 5.5 + 0.5;
-
-              if (item.year) {
-                doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(100, 100, 100);
-                doc.text(item.year, mainX, my); my += 5;
-              }
+              doc.text(hLines, mainX, my); my += hLines.length * 5.5 + 1;
+              if (item.duration) { doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(100, 100, 100); doc.text(item.duration, mainX, my); my += 5; }
             }
-            my += 2;
+            my += 4;
           });
         };
 
-        const expItems = (d.experience || []).filter(e => e.role || e.company);
+        const expItems = (d.experience || []).filter(e => e.role || e.organization);
         if (expItems.length) { mainSection('Experience'); mainEntry(expItems, 'exp'); }
-        const projItems = (d.projects || []).filter(p => p.name);
-        if (projItems.length) { mainSection('Projects'); mainEntry(projItems, 'proj'); }
+        if (d.achievements?.length) {
+          mainSection('Achievements');
+          doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(60, 60, 60);
+          d.achievements.forEach(a => { const ls = doc.splitTextToSize('• ' + a, mainW); doc.text(ls, mainX, my); my += ls.length * 4.5 + 1; });
+          my += 4;
+        }
         const eduItems = (d.education || []).filter(e => e.degree);
         if (eduItems.length) { mainSection('Education'); mainEntry(eduItems, 'edu'); }
 
