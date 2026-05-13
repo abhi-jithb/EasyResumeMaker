@@ -72,7 +72,7 @@ Click the **Fork** button on the top right of the GitHub repo page. This creates
 ### 2. Clone your fork
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/EasyResumeMaker.git
+git clone https://github.com/abhi-jithb/EasyResumeMaker.git
 cd EasyResumeMaker
 ```
 
