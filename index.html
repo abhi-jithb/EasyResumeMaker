@@ -866,6 +866,56 @@
       line-height: 1.5;
     }
 
+    .toast-region {
+      position: fixed;
+      right: 24px;
+      bottom: 88px;
+      z-index: 250;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: min(360px, calc(100vw - 48px));
+    }
+
+    .toast {
+      background: rgba(24, 24, 31, .94);
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-left: 3px solid var(--success);
+      border-radius: 14px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, .36);
+      color: var(--txt);
+      font-size: .78rem;
+      line-height: 1.5;
+      padding: 13px 16px;
+      transform: translateY(10px);
+      opacity: 0;
+      animation: toast-in .24s ease forwards;
+      backdrop-filter: blur(14px);
+    }
+
+    .toast.error {
+      border-left-color: var(--error);
+    }
+
+    .toast.leaving {
+      animation: toast-out .22s ease forwards;
+    }
+
+    @keyframes toast-in {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes toast-out {
+      to {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+    }
+
     @media print {
       .resume-preview {
         max-height: none;
@@ -947,6 +997,44 @@
 
     .btn-dl:hover {
       transform: scale(1.03)
+    }
+
+    .btn-copy {
+      background: rgba(255, 255, 255, .04);
+      color: var(--txt);
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .85rem;
+      border: 1px solid var(--border);
+      padding: 14px 24px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform .15s, border-color .2s, background .2s, color .2s;
+      min-height: 48px;
+    }
+
+    .btn-copy:hover {
+      transform: scale(1.03);
+      border-color: rgba(232, 255, 71, .45);
+      background: rgba(232, 255, 71, .08);
+    }
+
+    .btn-copy:focus-visible,
+    .btn-dl:focus-visible,
+    .btn-new:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .btn-copy.is-copying {
+      color: var(--txt2);
+      pointer-events: none;
+    }
+
+    .btn-copy.is-copied {
+      border-color: rgba(71, 255, 178, .5);
+      color: var(--success);
+      background: rgba(71, 255, 178, .08);
     }
 
     .btn-new {
@@ -1215,8 +1303,16 @@
       }
 
       .btn-dl,
+      .btn-copy,
       .btn-new {
         width: 100%
+      }
+
+      .toast-region {
+        right: 16px;
+        left: 16px;
+        bottom: 82px;
+        max-width: none;
       }
     }
   </style>
@@ -1439,10 +1535,13 @@
 
         <div class="btn-row">
           <button class="btn-dl" onclick="downloadPDF()">⬇ Download PDF</button>
+          <button class="btn-copy" id="copy-resume-btn" onclick="copyResume()" aria-label="Copy generated resume content to clipboard">Copy Resume</button>
           <button class="btn-new" onclick="startOver()">Try another URL</button>
         </div>
       </div>
     </div>
+
+    <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
 
     <!-- FAQ (SEO content) -->
     <section class="faq" aria-labelledby="faq-heading">
@@ -1808,6 +1907,168 @@ ${rawText}`;
       document.getElementById('resume-json-view').textContent = JSON.stringify(d, null, 2);
     }
 
+    // ===== COPY RESUME =====
+    function buildResumePlainText(d) {
+      const lines = [];
+      const add = value => {
+        if (value) lines.push(String(value).trim());
+      };
+      const addBlank = () => {
+        if (lines.length && lines[lines.length - 1] !== '') lines.push('');
+      };
+      const addSection = (title, writer) => {
+        const start = lines.length;
+        addBlank();
+        lines.push(title.toUpperCase());
+        writer();
+        if (lines.length === start + 1) lines.splice(start, 1);
+      };
+
+      const c = d.contact || {};
+      const contact = [c.phone || d.phone, c.email || d.email, c.location || d.location, ...(c.links || [])].filter(Boolean);
+      const links = d.links && !Array.isArray(d.links)
+        ? Object.entries(d.links).filter(([, value]) => value).map(([label, value]) => `${label}: ${value}`)
+        : [];
+
+      add(d.name || 'Your Name');
+      add(d.title);
+      if (contact.length) add(contact.join(' | '));
+      if (links.length) add(links.join(' | '));
+
+      if (d.about || d.summary) {
+        addSection('Profile', () => add(d.about || d.summary));
+      }
+
+      const experience = (d.experience || []).filter(e => e.role || e.organization || e.company || e.description || e.points?.length);
+      if (experience.length) {
+        addSection('Experience', () => {
+          experience.forEach(e => {
+            addBlank();
+            add([e.role, e.organization || e.company].filter(Boolean).join(' - '));
+            add([e.duration, e.location].filter(Boolean).join(' | '));
+            (e.points || []).forEach(point => add(`- ${point}`));
+            if (e.description) add(`- ${e.description}`);
+          });
+        });
+      }
+
+      const projects = (d.projects || []).filter(p => p.name || p.description);
+      if (projects.length) {
+        addSection('Projects', () => {
+          projects.forEach(p => {
+            addBlank();
+            add(p.name);
+            add(p.tech);
+            if (p.description) add(`- ${p.description}`);
+          });
+        });
+      }
+
+      if (d.achievements?.length) {
+        addSection('Achievements', () => d.achievements.forEach(item => add(`- ${item}`)));
+      }
+
+      const sk = d.skills || {};
+      const skillLines = Array.isArray(sk)
+        ? sk
+        : [
+          sk.languages?.length ? `Languages: ${sk.languages.join(', ')}` : '',
+          sk.tools?.length ? `Tools: ${sk.tools.join(', ')}` : '',
+          sk.soft_skills?.length ? `Soft Skills: ${sk.soft_skills.join(', ')}` : ''
+        ].filter(Boolean);
+      if (skillLines.length) {
+        addSection('Skills', () => skillLines.forEach(add));
+      }
+
+      if (d.languages_spoken?.length) {
+        addSection('Languages', () => add(d.languages_spoken.join(', ')));
+      }
+
+      const education = (d.education || []).filter(ed => ed.degree || ed.institution);
+      if (education.length) {
+        addSection('Education', () => {
+          education.forEach(ed => {
+            addBlank();
+            add([ed.degree, ed.institution].filter(Boolean).join(' - '));
+            add(ed.duration || ed.year);
+          });
+        });
+      }
+
+      return lines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+    }
+
+    async function copyTextToClipboard(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return;
+      }
+
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.top = '-999px';
+      textarea.style.left = '-999px';
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      const copied = document.execCommand('copy');
+      textarea.remove();
+      if (!copied) throw new Error('Clipboard fallback failed');
+    }
+
+    function showToast(message, type = 'success') {
+      const region = document.getElementById('toast-region');
+      if (!region) return;
+
+      const toast = document.createElement('div');
+      toast.className = `toast ${type === 'error' ? 'error' : ''}`;
+      toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
+      toast.textContent = message;
+      region.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('leaving');
+        toast.addEventListener('animationend', () => toast.remove(), { once: true });
+      }, 2600);
+    }
+
+    function setCopyButtonState(state) {
+      const btn = document.getElementById('copy-resume-btn');
+      if (!btn) return;
+
+      btn.classList.toggle('is-copying', state === 'copying');
+      btn.classList.toggle('is-copied', state === 'copied');
+      btn.disabled = state === 'copying';
+      btn.textContent = state === 'copying' ? 'Copying...' : state === 'copied' ? 'Copied' : 'Copy Resume';
+    }
+
+    async function copyResume() {
+      if (!resumeData) {
+        showToast('Generate a resume before copying.', 'error');
+        return;
+      }
+
+      const resumeText = buildResumePlainText(resumeData);
+      if (!resumeText) {
+        showToast('No resume content found to copy.', 'error');
+        return;
+      }
+
+      setCopyButtonState('copying');
+      try {
+        await copyTextToClipboard(resumeText);
+        setCopyButtonState('copied');
+        showToast('Resume copied successfully!');
+      } catch (error) {
+        setCopyButtonState('idle');
+        showToast('Failed to copy resume. Please try again.', 'error');
+      } finally {
+        setTimeout(() => setCopyButtonState('idle'), 2200);
+      }
+    }
+
     // ===== PDF DOWNLOAD =====
     function downloadPDF() {
       if (!resumeData) return;
@@ -2170,6 +2431,7 @@ ${rawText}`;
       document.getElementById('result-section').style.display = 'none';
       document.getElementById('stages').style.display = 'none';
       hideError();
+      setCopyButtonState('idle');
       resumeData = null;
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -2188,6 +2450,13 @@ ${rawText}`;
 
     document.getElementById('url-input').addEventListener('keydown', e => {
       if (e.key === 'Enter') generateResume();
+    });
+
+    document.addEventListener('keydown', e => {
+      const isCopyShortcut = (e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'c';
+      if (!isCopyShortcut || !resumeData) return;
+      e.preventDefault();
+      copyResume();
     });
 
     // Gemini Coming Soon Handler
