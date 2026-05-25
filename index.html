@@ -1150,6 +1150,17 @@
       cursor: pointer;
       transition: opacity .2s;
     }
+    .accent {
+    color: var(--accent-color);
+  }
+
+  .accent-bg {
+    background-color: var(--accent-color);
+  }
+
+  .accent-border {
+    border-color: var(--accent-color);
+  }
 
     .fb-submit:hover {
       opacity: 0.9
@@ -1225,7 +1236,8 @@
 <body>
 
   <div class="wrap">
-
+<label for="colorPicker">Choose Accent Color:</label>
+<input type="color" id="colorPicker" value="#000000">
     <!-- NAV -->
     <nav>
       <div class="logo">Easy<span>Resume</span> Maker</div>
@@ -1533,6 +1545,14 @@
   </div>
 
   <script>
+    let accentColor = "#000000";
+
+  const picker = document.getElementById("colorPicker");
+
+  picker.addEventListener("input", function () {
+    accentColor = this.value;
+    document.documentElement.style.setProperty('--accent-color', accentColor);
+  });
     // ===== STATE =====
     let resumeData = null;
     let selectedTemplate = 'minimal';
