@@ -456,6 +456,7 @@
 
     .url-field {
       flex: 1;
+      min-width: 0;
       background: transparent;
       border: none;
       color: var(--txt);
@@ -1223,7 +1224,8 @@
       }
 
       .url-inner {
-        flex-wrap: wrap
+        align-items: stretch;
+        flex-direction: column
       }
 
       .url-prefix {
@@ -1231,12 +1233,13 @@
       }
 
       .url-field {
-        padding: 16px
+        padding: 16px;
+        width: 100%
       }
 
       .go-btn {
         margin: 0 10px 10px;
-        width: calc(100% - 20px)
+        width: auto
       }
 
       .btn-row {
@@ -1246,6 +1249,18 @@
       .btn-dl,
       .btn-new {
         width: 100%
+      }
+    }
+
+    @media(max-width:399px) {
+      .template-grid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    @media(max-width:379px) {
+      .nav-badges {
+        display: none
       }
     }
   </style>
