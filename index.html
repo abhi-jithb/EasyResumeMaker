@@ -533,6 +533,7 @@
       color: var(--error);
       display: none;
       line-height: 1.6;
+      white-space: pre-wrap;
     }
 
     /* ===== STAGES ===== */
@@ -1669,14 +1670,29 @@
         if (!res.ok) throw new Error('HTTP ' + res.status);
         rawText = await res.text();
         rawText = rawText.slice(0, 30000); // Increased limit for better details
-        if (rawText.length < 100) throw new Error('Page returned very little content. It may require a login.');
-        setStage('stage-fetch', 'done', 'done ✓');
       } catch (e) {
         setStage('stage-fetch', 'waiting', 'failed ✗');
         showError('Could not read that URL. Make sure the page is public and accessible. Error: ' + e.message);
         document.getElementById('go-btn').disabled = false;
         return;
       }
+      if (rawText.length < 300) {
+        setStage('stage-fetch', 'waiting', 'failed ✗');
+        showError(
+          'This page may be JavaScript-rendered and couldn\'t be fully read.\n' +
+          'Only ' + rawText.length + ' characters were extracted — not enough to build a resume.\n\n' +
+          'This usually happens with React, Next.js, Vue, or Angular sites where content loads via JS.\n\n' +
+          'Try one of these instead:\n' +
+          '  • github.com/your-username\n' +
+          '  • dev.to/your-username\n' +
+          '  • read.cv/your-username\n' +
+          '  • hashnode.dev/@your-username\n' +
+          '  • linkedin.com/in/your-username  (public profile)'
+        );
+        document.getElementById('go-btn').disabled = false;
+        return;
+      }
+      setStage('stage-fetch', 'done', 'done ✓');
 
       // ── STAGE 2: AI PARSE ──
       setStage('stage-parse', 'active', 'extracting...');
