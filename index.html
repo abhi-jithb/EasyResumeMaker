@@ -22,7 +22,6 @@
   <meta name="twitter:description" content="The easiest way to turn your portfolio into a professional resume.">
   <link rel="canonical" href="https://easyresumemaker.tech">
 
-  <!-- Structured Data for SEO -->
   <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -66,12 +65,26 @@
       --error: #ff6b47;
     }
 
+    /* LIGHT MODE OVERRIDES */
+    body.light-mode {
+      --bg: #f5f4f0;
+      --bg2: #e9e8e4;
+      --bg3: #dcdbd7;
+      --accent: #c8df00; /* Darkened yellow for contrast */
+      --txt: #1a1a1a;
+      --txt2: #4a4a4a;
+      --txt3: #7a7a7a;
+      --border: #e0ddd8;
+      --card: #ffffff;
+    }
+
     body {
       background: var(--bg);
       color: var(--txt);
       font-family: 'Syne', sans-serif;
       min-height: 100vh;
       overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     /* NOISE */
@@ -128,7 +141,8 @@
 
     .nav-badges {
       display: flex;
-      gap: 8px
+      gap: 8px;
+      align-items: center;
     }
 
     .badge {
@@ -144,6 +158,26 @@
     .badge.green {
       color: var(--success);
       border-color: rgba(71, 255, 178, .25)
+    }
+
+    /* THEME TOGGLE BUTTON */
+    .theme-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--txt);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      border-radius: 50%;
+      margin-left: 12px;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+
+    .theme-btn:hover {
+      background: var(--bg3);
+      border-color: var(--txt3);
     }
 
     /* ===== HERO ===== */
@@ -202,7 +236,8 @@
       margin: 44px 0 0;
       border: 1px solid var(--border);
       border-radius: 16px;
-      overflow: hidden
+      overflow: hidden;
+      background: var(--card);
     }
 
     .step {
@@ -532,12 +567,10 @@
     }
 
     @keyframes pulse-b {
-
       0%,
       100% {
         box-shadow: 0 0 0 0 rgba(232, 255, 71, 0)
       }
-
       50% {
         box-shadow: 0 0 0 8px rgba(232, 255, 71, .06)
       }
@@ -595,12 +628,10 @@
     }
 
     @keyframes blink {
-
       0%,
       100% {
         opacity: 1
       }
-
       50% {
         opacity: .25
       }
@@ -638,15 +669,12 @@
       0% {
         width: 0
       }
-
       30% {
         width: 40%
       }
-
       70% {
         width: 88%
       }
-
       100% {
         width: 95%
       }
@@ -1322,16 +1350,29 @@
 
   <div class="wrap">
 
-    <!-- NAV -->
     <nav>
       <div class="logo">Easy<span>Resume</span> Maker</div>
-      <div class="nav-badges">
-        <span class="badge green">free</span>
-        <span class="badge">beta</span>
+      <div style="display: flex; align-items: center;">
+        <div class="nav-badges">
+          <span class="badge green">free</span>
+          <span class="badge">beta</span>
+        </div>
+        <button id="themeToggle" aria-label="Switch to light mode" class="theme-btn">
+          <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
       </div>
     </nav>
 
-    <!-- HERO -->
     <section class="hero">
       <div class="eyebrow">AI-powered · zero friction</div>
       <h1>Your link.<br><em>Your resume.</em><br>Instantly.</h1>
@@ -1339,7 +1380,6 @@
         downloadable PDF resume — no forms, no accounts, no drag-and-drop.</p>
     </section>
 
-    <!-- HOW IT WORKS -->
     <div class="steps" role="list" aria-label="How it works">
       <div class="step" role="listitem">
         <div class="step-num">01</div>
@@ -1359,21 +1399,18 @@
       </div>
     </div>
 
-    <!-- API CONFIG -->
     <div class="section-card" id="step1-card">
       <div class="section-label">Step 1 — Connect your AI key</div>
       <div class="api-row">
         <select class="api-select" id="provider-select" aria-label="Select AI provider">
           <option value="groq">⚡ Groq (Fastest)</option>
-          <!-- <option value="gemini">✦ Gemini</option> -->
-        </select>
+          </select>
         <input class="api-input" id="api-key-input" type="password" placeholder="Paste your API key here..."
           aria-label="API Key">
       </div>
       <div class="key-hint">Your key stays in your browser — never sent to our servers.</div>
     </div>
 
-    <!-- TEMPLATE PICKER -->
     <div class="section-card" id="step2-card">
       <div class="section-label">Step 2 — Choose a template</div>
       <div class="template-grid" role="radiogroup" aria-label="Resume template">
@@ -1427,7 +1464,6 @@
       </div>
     </div>
 
-    <!-- URL INPUT -->
     <div style="margin:20px 0 0">
       <div class="section-label">Step 3 — Your public URL</div>
       <div class="url-box" role="search">
@@ -1454,7 +1490,6 @@
 
     <div class="error-box" id="error-box" role="alert" aria-live="polite"></div>
 
-    <!-- LOADING STAGES -->
     <div class="stages" id="stages" aria-live="polite">
 
       <div class="stage waiting" id="stage-fetch">
@@ -1511,7 +1546,6 @@
 
     </div>
 
-    <!-- RESULT -->
     <div class="result-section" id="result-section" role="region" aria-label="Your generated resume">
       <div class="result-card">
         <div class="result-header">
@@ -1608,9 +1642,7 @@
       <div>Built for developers, designers & everyone in between · Zero data collected · Your resume, your data</div>
     </footer>
 
-  </div><!-- /wrap -->
-
-  <button class="fb-btn" onclick="toggleFeedback()">
+  </div><button class="fb-btn" onclick="toggleFeedback()">
     <span>✦ Feedback</span>
   </button>
 
@@ -1622,7 +1654,6 @@
       </p>
       <form action="https://formspree.io/f/xgorbrow" method="POST">
         <textarea name="message" class="fb-textarea" placeholder="What's on your mind?" required></textarea>
-        <!-- Hidden field for context -->
         <input type="hidden" name="_subject" value="New Feedback from EasyResume Maker">
         <button type="submit" class="fb-submit">Send Feedback →</button>
       </form>
@@ -1632,6 +1663,34 @@
   </div>
 
   <script>
+    // ===== THEME TOGGLE LOGIC =====
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const sunSvg = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+    const moonSvg = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+
+    // Initialize Theme
+    if (localStorage.getItem('theme') === 'light') {
+      document.body.classList.add('light-mode');
+      themeIcon.innerHTML = moonSvg;
+      themeToggleBtn.setAttribute('aria-label', 'Switch to dark mode');
+    }
+
+    // Toggle Theme
+    themeToggleBtn.addEventListener('click', () => {
+      document.body.classList.toggle('light-mode');
+      
+      if (document.body.classList.contains('light-mode')) {
+        localStorage.setItem('theme', 'light');
+        themeIcon.innerHTML = moonSvg;
+        themeToggleBtn.setAttribute('aria-label', 'Switch to dark mode');
+      } else {
+        localStorage.setItem('theme', 'dark');
+        themeIcon.innerHTML = sunSvg;
+        themeToggleBtn.setAttribute('aria-label', 'Switch to light mode');
+      }
+    });
+
     // ===== STATE =====
     let resumeData = null;
     let selectedTemplate = 'minimal';
@@ -1875,7 +1934,7 @@ ${rawText}`;
       // Contact markup
       const c = d.contact || {};
       const contactParts = [c.phone, c.email, c.location, ...(c.links || [])].filter(Boolean);
-      const contactMarkup = contactParts.map(cp => `<span>${esc(cp)}</span>`).join('');
+      const contactMarkup = contactParts.map(cp => `<span>${esc(cp)}</span>`).join(' &nbsp;·&nbsp; ');
 
       document.getElementById('resume-formatted-view').innerHTML = `
         <div class="resume-formatted">
