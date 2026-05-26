@@ -894,6 +894,127 @@
       line-height: 1.5;
     }
 
+    .editor-wrap {
+      display: grid;
+      gap: 16px;
+    }
+
+    .editor-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, .025);
+      padding: 18px;
+    }
+
+    .editor-card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .editor-card-title {
+      font-family: 'DM Mono', monospace;
+      font-size: .68rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .editor-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .editor-field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .editor-field.full {
+      grid-column: 1 / -1;
+    }
+
+    .editor-field label {
+      font-size: .68rem;
+      color: var(--txt3);
+      font-weight: 700;
+    }
+
+    .editor-input,
+    .editor-textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      color: var(--txt);
+      border-radius: 8px;
+      padding: 10px 11px;
+      font: inherit;
+      font-size: .82rem;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .editor-textarea {
+      min-height: 92px;
+      resize: vertical;
+      line-height: 1.55;
+    }
+
+    .editor-input:focus,
+    .editor-textarea:focus {
+      border-color: rgba(232, 255, 71, .65);
+      box-shadow: 0 0 0 3px rgba(232, 255, 71, .08);
+    }
+
+    .editor-items {
+      display: grid;
+      gap: 12px;
+    }
+
+    .editor-item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      background: rgba(0, 0, 0, .12);
+    }
+
+    .editor-item-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      color: var(--txt2);
+      font-size: .74rem;
+      font-weight: 700;
+    }
+
+    .editor-add,
+    .editor-remove {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg3);
+      color: var(--txt);
+      padding: 8px 11px;
+      font-size: .72rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .2s, border-color .2s;
+    }
+
+    .editor-add:hover,
+    .editor-remove:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent);
+    }
+
+    .editor-remove {
+      color: #ffb4b4;
+    }
+
     @media print {
       .resume-preview {
         max-height: none;
@@ -1453,12 +1574,12 @@
     <div class="result-section" id="result-section" role="region" aria-label="Your generated resume">
       <div class="result-card">
         <div class="result-header">
-          <div class="result-title">Resume <span>ready!</span></div>
-          <div class="result-sub">Generated from your URL · Pick your download format below</div>
+          <div class="result-title">Review <span>resume data</span></div>
+          <div class="result-sub">Edit anything that looks off, then download the final PDF</div>
         </div>
 
         <div class="preview-tabs" role="tablist">
-          <div class="ptab active" role="tab" aria-selected="true" onclick="switchTab('formatted')">Preview</div>
+          <div class="ptab active" role="tab" aria-selected="true" onclick="switchTab('formatted')">Edit Preview</div>
           <div class="ptab" role="tab" aria-selected="false" onclick="switchTab('json')">Raw Data</div>
         </div>
 
@@ -1472,7 +1593,7 @@
         </div>
 
         <div class="btn-row">
-          <button class="btn-dl" onclick="downloadPDF()">⬇ Download PDF</button>
+          <button class="btn-dl" onclick="downloadPDF()">Looks good -> Download PDF</button>
           <button class="btn-new" onclick="startOver()">Try another URL</button>
         </div>
       </div>
@@ -1814,6 +1935,11 @@ ${rawText}`;
 
     // ===== RENDER PREVIEW =====
     function renderPreview(d) {
+      normalizeResumeData(d);
+      renderResumeEditor();
+      updateRawPreview();
+      return;
+
       // Experience markup
       const exp = (d.experience || []).filter(e => e.role || e.organization).map(e => `
         <div class="rf-item-title">${esc(e.role)}${e.organization ? ' · ' + esc(e.organization) : ''}</div>
@@ -1866,9 +1992,196 @@ ${rawText}`;
       document.getElementById('resume-json-view').textContent = JSON.stringify(d, null, 2);
     }
 
+    function normalizeResumeData(d) {
+      d.contact = d.contact || {};
+      d.contact.links = Array.isArray(d.contact.links) ? d.contact.links : [];
+      d.experience = Array.isArray(d.experience) ? d.experience : [];
+      d.projects = Array.isArray(d.projects) ? d.projects : [];
+      d.education = Array.isArray(d.education) ? d.education : [];
+      d.achievements = Array.isArray(d.achievements) ? d.achievements : [];
+      d.languages_spoken = Array.isArray(d.languages_spoken) ? d.languages_spoken : [];
+
+      if (Array.isArray(d.skills)) {
+        d.skills = { languages: [], tools: d.skills, soft_skills: [] };
+      }
+      d.skills = d.skills || {};
+      d.skills.languages = Array.isArray(d.skills.languages) ? d.skills.languages : [];
+      d.skills.tools = Array.isArray(d.skills.tools) ? d.skills.tools : [];
+      d.skills.soft_skills = Array.isArray(d.skills.soft_skills) ? d.skills.soft_skills : [];
+
+      if (!d.about && d.summary) d.about = d.summary;
+      if (!d.summary && d.about) d.summary = d.about;
+
+      d.experience.forEach(e => {
+        if (!e.organization && e.company) e.organization = e.company;
+        if (!e.company && e.organization) e.company = e.organization;
+        if (!Array.isArray(e.points)) e.points = e.description ? [e.description] : [];
+        e.description = e.points.join('\n');
+      });
+
+      d.education.forEach(e => {
+        if (!e.duration && e.year) e.duration = e.year;
+        if (!e.year && e.duration) e.year = e.duration;
+      });
+    }
+
+    function renderResumeEditor() {
+      const d = resumeData;
+      const sk = d.skills || {};
+      const editor = document.getElementById('resume-formatted-view');
+      editor.innerHTML = `
+        <div class="editor-wrap">
+          <div class="editor-card">
+            <div class="editor-card-head"><div class="editor-card-title">Profile</div></div>
+            <div class="editor-grid">
+              ${editorField('Name', 'name', d.name)}
+              ${editorField('Title', 'title', d.title)}
+              ${editorField('Summary', 'about', d.about, 'textarea', true)}
+            </div>
+          </div>
+
+          <div class="editor-card">
+            <div class="editor-card-head"><div class="editor-card-title">Contact</div></div>
+            <div class="editor-grid">
+              ${editorField('Phone', 'contact.phone', d.contact.phone)}
+              ${editorField('Email', 'contact.email', d.contact.email)}
+              ${editorField('Location', 'contact.location', d.contact.location)}
+              ${editorField('Links', 'contact.links', d.contact.links.join('\n'), 'textarea', true, true)}
+            </div>
+          </div>
+
+          ${editorObjectList('Experience', 'experience', d.experience, [
+            ['Role', 'role'],
+            ['Organization', 'organization'],
+            ['Location', 'location'],
+            ['Duration', 'duration'],
+            ['Bullet points', 'points', 'textarea', true]
+          ])}
+
+          ${editorObjectList('Projects', 'projects', d.projects, [
+            ['Project name', 'name'],
+            ['Tech stack', 'tech'],
+            ['Description', 'description', 'textarea', true]
+          ])}
+
+          ${editorObjectList('Education', 'education', d.education, [
+            ['Degree', 'degree'],
+            ['Institution', 'institution'],
+            ['Duration', 'duration']
+          ])}
+
+          <div class="editor-card">
+            <div class="editor-card-head"><div class="editor-card-title">Skills</div></div>
+            <div class="editor-grid">
+              ${editorField('Languages', 'skills.languages', sk.languages.join('\n'), 'textarea', true, true)}
+              ${editorField('Tools', 'skills.tools', sk.tools.join('\n'), 'textarea', true, true)}
+              ${editorField('Soft skills', 'skills.soft_skills', sk.soft_skills.join('\n'), 'textarea', true, true)}
+            </div>
+          </div>
+
+          <div class="editor-card">
+            <div class="editor-card-head"><div class="editor-card-title">Extras</div></div>
+            <div class="editor-grid">
+              ${editorField('Achievements', 'achievements', d.achievements.join('\n'), 'textarea', true, true)}
+              ${editorField('Languages spoken', 'languages_spoken', d.languages_spoken.join('\n'), 'textarea', true, true)}
+            </div>
+          </div>
+        </div>`;
+
+      editor.querySelectorAll('[data-editor-path]').forEach(input => {
+        input.addEventListener('input', () => {
+          setEditorValue(input.dataset.editorPath, input.value, input.dataset.list === 'true');
+          syncResumeCompatibility();
+          updateRawPreview();
+        });
+      });
+    }
+
+    function editorObjectList(title, section, items, fields) {
+      return `
+        <div class="editor-card">
+          <div class="editor-card-head">
+            <div class="editor-card-title">${esc(title)}</div>
+            <button type="button" class="editor-add" onclick="addEditorItem('${section}')">Add item</button>
+          </div>
+          <div class="editor-items">
+            ${items.map((item, index) => `
+              <div class="editor-item">
+                <div class="editor-item-head">
+                  <span>${esc(title)} ${index + 1}</span>
+                  <button type="button" class="editor-remove" onclick="removeEditorItem('${section}', ${index})">Remove</button>
+                </div>
+                <div class="editor-grid">
+                  ${fields.map(([label, key, type, full]) => {
+                    const value = Array.isArray(item[key]) ? item[key].join('\n') : item[key];
+                    return editorField(label, `${section}.${index}.${key}`, value, type, full, Array.isArray(item[key]) || key === 'points');
+                  }).join('')}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>`;
+    }
+
+    function editorField(label, path, value = '', type = 'input', full = false, list = false) {
+      const cls = full ? 'editor-field full' : 'editor-field';
+      const common = `data-editor-path="${esc(path)}" data-list="${list}"`;
+      const safeValue = esc(value || '');
+      return `
+        <div class="${cls}">
+          <label>${esc(label)}</label>
+          ${type === 'textarea'
+            ? `<textarea class="editor-textarea" ${common}>${safeValue}</textarea>`
+            : `<input class="editor-input" ${common} value="${safeValue}">`}
+        </div>`;
+    }
+
+    function setEditorValue(path, value, isList) {
+      const keys = path.split('.');
+      let target = resumeData;
+      keys.slice(0, -1).forEach(key => {
+        target = target[Number.isInteger(Number(key)) ? Number(key) : key];
+      });
+      target[keys[keys.length - 1]] = isList
+        ? value.split('\n').map(v => v.trim()).filter(Boolean)
+        : value;
+    }
+
+    function addEditorItem(section) {
+      const blankItems = {
+        experience: { role: '', organization: '', company: '', location: '', duration: '', points: [], description: '' },
+        projects: { name: '', tech: '', description: '' },
+        education: { degree: '', institution: '', duration: '', year: '' }
+      };
+      resumeData[section].push(blankItems[section]);
+      renderPreview(resumeData);
+    }
+
+    function removeEditorItem(section, index) {
+      resumeData[section].splice(index, 1);
+      renderPreview(resumeData);
+    }
+
+    function syncResumeCompatibility() {
+      resumeData.summary = resumeData.about || '';
+      resumeData.experience.forEach(e => {
+        e.company = e.organization || '';
+        e.description = Array.isArray(e.points) ? e.points.join('\n') : '';
+      });
+      resumeData.education.forEach(e => {
+        e.year = e.duration || '';
+      });
+    }
+
+    function updateRawPreview() {
+      document.getElementById('resume-json-view').textContent = JSON.stringify(resumeData, null, 2);
+    }
+
     // ===== PDF DOWNLOAD =====
     function downloadPDF() {
       if (!resumeData) return;
+      normalizeResumeData(resumeData);
+      syncResumeCompatibility();
       const d = resumeData;
       const tpl = selectedTemplate;
       const { jsPDF } = window.jspdf;
@@ -1899,6 +2212,7 @@ ${rawText}`;
         const sections = [
           { id: 'about', title: 'About Me', content: d.about ? [{ type: 'text', val: d.about }] : [] },
           { id: 'exp', title: 'Experience', content: (d.experience || []).map(e => ({ type: 'entry', val: e })) },
+          { id: 'proj', title: 'Projects', content: (d.projects || []).map(p => ({ type: 'project', val: p })) },
           { id: 'ach', title: 'Achievements', content: d.achievements?.length ? [{ type: 'list', val: d.achievements }] : [] },
           { id: 'skills', title: 'Technical Skills', content: (d.skills && (d.skills.languages?.length || d.skills.tools?.length || d.skills.soft_skills?.length)) ? [{ type: 'skills', val: d.skills }] : [] },
           { id: 'langs', title: 'Languages', content: d.languages_spoken?.length ? [{ type: 'spoken', val: d.languages_spoken }] : [] },
@@ -1941,6 +2255,19 @@ ${rawText}`;
                 doc.text(pLines, lm, y); y += pLines.length * 4.5 + 1;
               });
               y += 3;
+            } else if (item.type === 'project') {
+              const p = item.val;
+              doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5); doc.setTextColor(20, 20, 20);
+              doc.text(p.name || '', lm, y); y += 5;
+              if (p.tech) {
+                doc.setFont('times', 'italic'); doc.setFontSize(9.5); doc.setTextColor(80, 80, 80);
+                doc.text(p.tech, lm, y); y += 5;
+              }
+              if (p.description) {
+                doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(50, 50, 50);
+                const pLines = doc.splitTextToSize(p.description, pw - 5);
+                doc.text(pLines, lm, y); y += pLines.length * 4.5 + 3;
+              }
             } else if (item.type === 'list') {
               doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(50, 50, 50);
               item.val.forEach(a => {
@@ -2069,6 +2396,16 @@ ${rawText}`;
               if (item.duration) { doc.setFont('helvetica', 'italic'); doc.setFontSize(9); doc.setTextColor(100, 100, 100); doc.text(item.duration, mainX, my); my += 5; }
               doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(60, 60, 60);
               (item.points || []).forEach(p => { const ls = doc.splitTextToSize('• ' + p, mainW); doc.text(ls, mainX, my); my += ls.length * 4.5 + 1; });
+            } else if (type === 'proj') {
+              doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(20, 20, 20);
+              const hLines = doc.splitTextToSize(item.name || '', mainW);
+              doc.text(hLines, mainX, my); my += hLines.length * 5.5 + 1;
+              if (item.tech) { doc.setFont('helvetica', 'italic'); doc.setFontSize(9); doc.setTextColor(100, 100, 100); doc.text(item.tech, mainX, my); my += 5; }
+              if (item.description) {
+                doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(60, 60, 60);
+                const ls = doc.splitTextToSize(item.description, mainW);
+                doc.text(ls, mainX, my); my += ls.length * 4.5 + 1;
+              }
             } else if (type === 'edu') {
               doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(20, 20, 20);
               const header = (item.degree || '') + (item.institution ? ' · ' + item.institution : '');
@@ -2082,6 +2419,8 @@ ${rawText}`;
 
         const expItems = (d.experience || []).filter(e => e.role || e.organization);
         if (expItems.length) { mainSection('Experience'); mainEntry(expItems, 'exp'); }
+        const projectItems = (d.projects || []).filter(p => p.name);
+        if (projectItems.length) { mainSection('Projects'); mainEntry(projectItems, 'proj'); }
         if (d.achievements?.length) {
           mainSection('Achievements');
           doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(60, 60, 60);
@@ -2110,7 +2449,8 @@ ${rawText}`;
         doc.setTextColor(...A);
         doc.text(d.title || '', lm + 8, y); y += 7;
 
-        const contact = [d.email, d.phone, d.location, d.website].filter(Boolean).join('  ·  ');
+        const clsContact = d.contact || {};
+        const contact = [clsContact.email, clsContact.phone, clsContact.location, ...(clsContact.links || [])].filter(Boolean).join('  ·  ');
         doc.setFont('courier', 'normal');
         doc.setFontSize(8);
         doc.setTextColor(120, 100, 80);
@@ -2138,7 +2478,7 @@ ${rawText}`;
               doc.setFont('helvetica', 'bold');
               doc.setFontSize(11);
               doc.setTextColor(30, 20, 10);
-              const h = type === 'exp' ? (item.role || '') + (item.company ? ' · ' + item.company : '') : item.name || '';
+              const h = type === 'exp' ? (item.role || '') + (item.organization ? ' · ' + item.organization : '') : item.name || '';
               const hLines = doc.splitTextToSize(h, pw - 10);
               doc.text(hLines, lm, y); y += hLines.length * 5.5 + 0.5;
 
@@ -2148,7 +2488,7 @@ ${rawText}`;
                 const sLines = doc.splitTextToSize(sub, pw - 10);
                 doc.text(sLines, lm, y); y += sLines.length * 4.5 + 1;
               }
-              const desc = item.description;
+              const desc = Array.isArray(item.points) && item.points.length ? item.points.join('\n') : item.description;
               if (desc) {
                 doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(70, 55, 40);
                 const ls = doc.splitTextToSize(desc, pw - 10);
@@ -2170,27 +2510,28 @@ ${rawText}`;
           y += 2;
         };
 
-        if (d.summary) {
+        if (d.about) {
           clsSection('Profile');
           doc.setFont('times', 'italic');
           doc.setFontSize(10.5);
           doc.setTextColor(70, 55, 40);
-          const ls = doc.splitTextToSize(d.summary, pw);
+          const ls = doc.splitTextToSize(d.about, pw);
           doc.text(ls, lm, y); y += ls.length * 5 + 6;
         }
 
-        const expItems = (d.experience || []).filter(e => e.role || e.company);
+        const expItems = (d.experience || []).filter(e => e.role || e.organization);
         if (expItems.length) { clsSection('Experience'); clsEntry(expItems, 'exp'); }
         const projItems = (d.projects || []).filter(p => p.name);
         if (projItems.length) { clsSection('Projects'); clsEntry(projItems, 'proj'); }
         const eduItems = (d.education || []).filter(e => e.degree);
         if (eduItems.length) { clsSection('Education'); clsEntry(eduItems, 'edu'); }
-        if (d.skills?.length) {
+        const classicSkills = d.skills ? [...(d.skills.languages || []), ...(d.skills.tools || []), ...(d.skills.soft_skills || [])] : [];
+        if (classicSkills.length) {
           clsSection('Skills');
           doc.setFont('helvetica', 'normal');
           doc.setFontSize(10);
           doc.setTextColor(70, 55, 40);
-          const ls = doc.splitTextToSize(d.skills.join('  ·  '), pw - 10);
+          const ls = doc.splitTextToSize(classicSkills.join('  ·  '), pw - 10);
           doc.text(ls, lm, y); y += ls.length * 5.5 + 6;
         }
         if (d.links && Object.values(d.links).some(Boolean)) {
