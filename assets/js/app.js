@@ -211,11 +211,15 @@
       const c = d.contact || {};
       const contactParts = [c.phone, c.email, c.location, ...(c.links || [])].filter(Boolean);
       const contactMarkup = contactParts.map(cp => `<span>${esc(cp)}</span>`).join(' &nbsp;·&nbsp; ');
+      const emptyMarkup = !window.EasyResumeState.hasResumeContent(d)
+        ? `<div class="resume-empty">${esc(window.EasyResumeState.getResumeEmptyMessage())}</div>`
+        : '';
 
       document.getElementById('resume-formatted-view').innerHTML = `
         <div class="resume-formatted">
           <div class="rf-name">${esc(d.name || 'Your Name')}</div>
           <div class="rf-contact">${contactMarkup}</div>
+          ${emptyMarkup}
           ${d.about ? `<div class="rf-section">About Me</div><div class="rf-item-desc">${esc(d.about)}</div>` : ''}
           ${exp ? `<div class="rf-section">Experience</div>${exp}` : ''}
           ${d.achievements?.length ? `

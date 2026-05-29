@@ -856,6 +856,16 @@
       background: rgba(232, 255, 71, 0.05);
     }
 
+    .resume-empty {
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      color: var(--txt2);
+      font-size: .8rem;
+      line-height: 1.65;
+      padding: 16px;
+      background: rgba(255, 255, 255, .025);
+    }
+
     .json-preview {
       font-family: 'DM Mono', monospace;
       font-size: .7rem;
