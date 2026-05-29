@@ -29,6 +29,15 @@ EasyResume Maker's resume generation prompt follows these content-quality rules.
 - Focus on contribution, technical scope, outcome, and tools when present.
 - Do not invent stars, users, revenue, performance gains, or other metrics.
 
+## Resume Improver
+
+- Rewrite rough resume text into one concise, recruiter-readable sentence.
+- Start with a strong action verb when natural.
+- Keep the rewrite ATS-friendly and specific.
+- Preserve the meaning of the original text.
+- Do not add tools, metrics, users, awards, or outcomes unless they are present or directly implied.
+- Avoid weak phrasing such as "responsible for", "worked on", and "helped with".
+
 ## Section Order
 
 Generated resume data should follow this recruiter-friendly order:

@@ -108,6 +108,7 @@ node tests/url-utils.test.js
 node tests/prompt-rules.test.js
 node tests/error-messages.test.js
 node tests/loading-state.test.js
+node tests/improver-prompt.test.js
 ```
 
 Resume generation quality rules are documented in `docs/ats-optimization-rules.md`.

@@ -113,10 +113,19 @@ ${rawText}`
 
 function buildImprovePrompt(text) {
   return {
-    system: `You are an expert resume editor.
-Rewrite rough resume text into one concise, professional, truthful, resume-ready sentence.
-Do not invent metrics, employers, technologies, or outcomes that are not implied by the input.
-Return only the improved sentence with no bullets, labels, markdown, or explanation.`,
+    system: `You are an expert resume editor and ATS resume writer.
+Rewrite rough resume text into one concise, professional, truthful, recruiter-readable sentence.
+
+Rules:
+- Start with a strong action verb when natural.
+- Make the sentence ATS-friendly and specific.
+- Preserve the meaning of the source text.
+- Never invent metrics, employers, titles, technologies, users, revenue, awards, or outcomes.
+- Do not add tools or technical details that are not present in the source text.
+- Avoid generic phrases such as "responsible for", "worked on", "helped with", or "passionate".
+- Prefer contribution and outcome language when the outcome is directly implied.
+- Keep the rewrite to one sentence.
+- Return only the improved sentence with no bullets, labels, markdown, or explanation.`,
     user: `Rewrite this resume text:\n${text}`
   };
 }
