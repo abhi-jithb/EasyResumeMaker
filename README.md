@@ -15,6 +15,7 @@ V2 keeps the app static and lightweight while moving AI credentials behind a sma
 - Empty-state guidance for sparse generated resumes
 - Resume preview sections for projects and leadership/community work
 - Safer PDF filenames for generated resumes
+- Clear template switching feedback after resume generation
 - ATS-friendly prompt rules for summaries, projects, bullets, and section ordering
 - Server-side AI calls using environment variables
 - OpenAI as the default AI provider
@@ -121,6 +122,7 @@ node tests/mobile-css.test.js
 node tests/preview-sections.test.js
 node tests/pdf-utils.test.js
 node tests/compact-template.test.js
+node tests/template-switching.test.js
 ```
 
 Resume generation quality rules are documented in `docs/ats-optimization-rules.md`.

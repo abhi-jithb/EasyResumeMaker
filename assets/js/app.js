@@ -30,6 +30,21 @@
     let resumeData = null;
     let selectedTemplate = 'minimal';
 
+    function getTemplateName(template) {
+      return {
+        minimal: 'Minimal',
+        modern: 'Modern',
+        classic: 'Classic',
+        compact: 'Compact'
+      }[template] || 'Selected';
+    }
+
+    function updateResultTemplateLabel() {
+      const el = document.getElementById('result-sub');
+      if (!el) return;
+      el.textContent = `Generated from your URL · PDF template: ${getTemplateName(selectedTemplate)}`;
+    }
+
     // ===== TEMPLATE SELECTION =====
     function selectTemplate(el) {
       document.querySelectorAll('.tpl').forEach(t => {
@@ -39,6 +54,10 @@
       el.classList.add('selected');
       el.setAttribute('aria-checked', 'true');
       selectedTemplate = el.dataset.tpl;
+      updateResultTemplateLabel();
+      if (resumeData) {
+        showToast(`PDF template set to ${getTemplateName(selectedTemplate)}.`);
+      }
     }
 
     // ===== HINTS =====
@@ -181,6 +200,7 @@
       setStage('stage-pdf', 'done', 'done ✓');
 
       await delay(300);
+      updateResultTemplateLabel();
       document.getElementById('result-section').style.display = 'block';
       document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
       setGenerateButtonState('idle');
