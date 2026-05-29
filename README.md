@@ -21,6 +21,7 @@ V2 keeps the app static and lightweight while moving AI credentials behind a sma
 - Groq-compatible provider abstraction for future use
 - AI Resume Improver for polishing rough resume sentences
 - 3 PDF templates: Minimal, Modern, Classic
+- Compact PDF template for dense one-page resumes
 - Client-side PDF generation with jsPDF
 - Feedback modal via Formspree
 - Vercel Insights support
@@ -119,6 +120,7 @@ node tests/api-validation.test.js
 node tests/mobile-css.test.js
 node tests/preview-sections.test.js
 node tests/pdf-utils.test.js
+node tests/compact-template.test.js
 ```
 
 Resume generation quality rules are documented in `docs/ats-optimization-rules.md`.

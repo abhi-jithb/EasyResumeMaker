@@ -433,29 +433,30 @@
       const d = resumeData;
       const tpl = selectedTemplate;
       const { jsPDF } = window.jspdf;
+      const isCompact = tpl === 'compact';
 
       const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-      const lm = 20, rm = 190, pw = rm - lm;
-      let y = 20;
+      const lm = isCompact ? 14 : 20, rm = isCompact ? 196 : 190, pw = rm - lm;
+      let y = isCompact ? 14 : 20;
 
-      // ── Template: MINIMAL (Matches Reference Image) ──
-      if (tpl === 'minimal') {
+      // ── Template: MINIMAL / COMPACT ──
+      if (tpl === 'minimal' || tpl === 'compact') {
         // Header
         doc.setFont('times', 'bold');
-        doc.setFontSize(24);
+        doc.setFontSize(isCompact ? 20 : 24);
         doc.setTextColor(20, 20, 20);
         const nameLines = doc.splitTextToSize(d.name || 'Your Name', pw);
         doc.text(nameLines, lm + (pw / 2), y, { align: 'center' });
-        y += 8;
+        y += isCompact ? 6 : 8;
 
         const c = d.contact || {};
         const contact = [c.phone, c.email, c.location, ...(c.links || [])].filter(Boolean).join(' — ');
         doc.setFont('times', 'normal');
-        doc.setFontSize(9);
+        doc.setFontSize(isCompact ? 8 : 9);
         doc.setTextColor(60, 60, 60);
         const cLines = doc.splitTextToSize(contact, pw);
         doc.text(cLines, lm + (pw / 2), y, { align: 'center' });
-        y += 12;
+        y += isCompact ? 8 : 12;
 
         const sections = [
           { id: 'about', title: 'About Me', content: d.about ? [{ type: 'text', val: d.about }] : [] },
@@ -468,70 +469,70 @@
 
         sections.forEach(sec => {
           if (!sec.content.length) return;
-          if (y > 265) { doc.addPage(); y = 20; }
+          if (y > 265) { doc.addPage(); y = isCompact ? 14 : 20; }
 
           // Section Title
           doc.setFont('helvetica', 'bold');
-          doc.setFontSize(10);
+          doc.setFontSize(isCompact ? 8.5 : 10);
           doc.setTextColor(30, 30, 30);
           doc.text(sec.title.toUpperCase(), lm, y);
           y += 2;
           doc.setDrawColor(30,30,30); doc.setLineWidth(0.4); doc.line(lm, y, rm, y); 
-          y += 6;
+          y += isCompact ? 4 : 6;
 
           sec.content.forEach(item => {
-            if (y > 270) { doc.addPage(); y = 20; }
+            if (y > 270) { doc.addPage(); y = isCompact ? 14 : 20; }
 
             if (item.type === 'text') {
-              doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(50, 50, 50);
+              doc.setFont('helvetica', 'normal'); doc.setFontSize(isCompact ? 8.8 : 10); doc.setTextColor(50, 50, 50);
               const lines = doc.splitTextToSize(item.val, pw);
-              doc.text(lines, lm, y); y += lines.length * 4.8 + 4;
+              doc.text(lines, lm, y); y += lines.length * (isCompact ? 3.8 : 4.8) + (isCompact ? 2 : 4);
             } else if (item.type === 'entry') {
               const e = item.val;
-              doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5); doc.setTextColor(20, 20, 20);
+              doc.setFont('helvetica', 'bold'); doc.setFontSize(isCompact ? 9.2 : 10.5); doc.setTextColor(20, 20, 20);
               doc.text(e.role || '', lm, y);
-              if (e.duration) { doc.setFont('times', 'italic'); doc.setFontSize(9); doc.text(e.duration, rm, y, { align: 'right' }); }
-              y += 5;
-              doc.setFont('times', 'italic'); doc.setFontSize(10); doc.setTextColor(80, 80, 80);
+              if (e.duration) { doc.setFont('times', 'italic'); doc.setFontSize(isCompact ? 8 : 9); doc.text(e.duration, rm, y, { align: 'right' }); }
+              y += isCompact ? 4 : 5;
+              doc.setFont('times', 'italic'); doc.setFontSize(isCompact ? 8.8 : 10); doc.setTextColor(80, 80, 80);
               doc.text(e.organization || '', lm, y);
               if (e.location) { doc.text(e.location, rm, y, { align: 'right' }); }
-              y += 5;
-              doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(50, 50, 50);
+              y += isCompact ? 4 : 5;
+              doc.setFont('helvetica', 'normal'); doc.setFontSize(isCompact ? 8.5 : 9.5); doc.setTextColor(50, 50, 50);
               (e.points || []).forEach(p => {
                 const pLines = doc.splitTextToSize('• ' + p, pw - 5);
-                doc.text(pLines, lm, y); y += pLines.length * 4.5 + 1;
+                doc.text(pLines, lm, y); y += pLines.length * (isCompact ? 3.6 : 4.5) + 1;
               });
-              y += 3;
+              y += isCompact ? 2 : 3;
             } else if (item.type === 'list') {
-              doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(50, 50, 50);
+              doc.setFont('helvetica', 'normal'); doc.setFontSize(isCompact ? 8.5 : 9.5); doc.setTextColor(50, 50, 50);
               item.val.forEach(a => {
                 const aLines = doc.splitTextToSize('• ' + a, pw - 5);
-                doc.text(aLines, lm, y); y += aLines.length * 4.5 + 1;
+                doc.text(aLines, lm, y); y += aLines.length * (isCompact ? 3.6 : 4.5) + 1;
               });
-              y += 3;
+              y += isCompact ? 2 : 3;
             } else if (item.type === 'skills') {
               const s = item.val;
               const drawSkill = (label, values) => {
                 if (!values?.length) return;
-                doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.text(label + ':', lm, y);
+                doc.setFont('helvetica', 'bold'); doc.setFontSize(isCompact ? 8.5 : 9.5); doc.text(label + ':', lm, y);
                 doc.setFont('helvetica', 'normal'); const valStr = values.join(', '); const vLines = doc.splitTextToSize(valStr, pw - 30);
-                doc.text(vLines, lm + 25, y); y += vLines.length * 4.5 + 1;
+                doc.text(vLines, lm + 25, y); y += vLines.length * (isCompact ? 3.6 : 4.5) + 1;
               };
               drawSkill('Languages', s.languages);
               drawSkill('Tools', s.tools);
               drawSkill('Soft Skills', s.soft_skills);
               y += 2;
             } else if (item.type === 'spoken') {
-              doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.text(item.val.join('  —  '), lm, y); y += 6;
+              doc.setFont('helvetica', 'normal'); doc.setFontSize(isCompact ? 8.8 : 10); doc.text(item.val.join('  —  '), lm, y); y += isCompact ? 4 : 6;
             } else if (item.type === 'edu') {
               const e = item.val;
-              doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5); doc.text(e.degree || '', lm, y);
-              if (e.duration) { doc.setFont('times', 'italic'); doc.setFontSize(9); doc.text(e.duration, rm, y, { align: 'right' }); }
-              y += 5;
-              doc.setFont('times', 'italic'); doc.setFontSize(10); doc.text(e.institution || '', lm, y); y += 6;
+              doc.setFont('helvetica', 'bold'); doc.setFontSize(isCompact ? 9.2 : 10.5); doc.text(e.degree || '', lm, y);
+              if (e.duration) { doc.setFont('times', 'italic'); doc.setFontSize(isCompact ? 8 : 9); doc.text(e.duration, rm, y, { align: 'right' }); }
+              y += isCompact ? 4 : 5;
+              doc.setFont('times', 'italic'); doc.setFontSize(isCompact ? 8.8 : 10); doc.text(e.institution || '', lm, y); y += isCompact ? 4 : 6;
             }
           });
-          y += 4;
+          y += isCompact ? 2 : 4;
         });
 
         // ── Template: MODERN ──
