@@ -13,7 +13,7 @@ module.exports = function handler(req, res) {
   } catch (error) {
     return sendJson(res, 500, {
       ok: false,
-      provider: process.env.AI_PROVIDER || 'openai',
+      provider: process.env.AI_PROVIDER || 'groq',
       configured: false,
       error: {
         code: error.code || 'server_misconfigured',

@@ -5,11 +5,13 @@ const { checkRateLimit } = require('../api/lib/rate-limit');
 
 function callHealth(env) {
   const previous = { ...process.env };
-  process.env.AI_PROVIDER = env.AI_PROVIDER;
-  process.env.OPENAI_API_KEY = env.OPENAI_API_KEY;
-  process.env.OPENAI_MODEL = env.OPENAI_MODEL;
-  process.env.GROQ_API_KEY = env.GROQ_API_KEY;
-  process.env.GROQ_MODEL = env.GROQ_MODEL;
+  ['AI_PROVIDER', 'OPENAI_API_KEY', 'OPENAI_MODEL', 'GROQ_API_KEY', 'GROQ_MODEL'].forEach(key => {
+    if (Object.prototype.hasOwnProperty.call(env, key)) {
+      process.env[key] = env[key];
+    } else {
+      delete process.env[key];
+    }
+  });
 
   return new Promise(resolve => {
     const res = {
@@ -18,7 +20,13 @@ function callHealth(env) {
         this.headers[key] = value;
       },
       end(payload) {
-        process.env = previous;
+        ['AI_PROVIDER', 'OPENAI_API_KEY', 'OPENAI_MODEL', 'GROQ_API_KEY', 'GROQ_MODEL'].forEach(key => {
+          if (Object.prototype.hasOwnProperty.call(previous, key)) {
+            process.env[key] = previous[key];
+          } else {
+            delete process.env[key];
+          }
+        });
         resolve({
           statusCode: this.statusCode,
           payload: JSON.parse(payload)
@@ -42,18 +50,15 @@ function callHealth(env) {
   assert.ok(vercelConfig.includes('"Cache-Control", "value": "no-store"'), 'API responses should not be cached');
 
   const healthy = await callHealth({
-    AI_PROVIDER: 'openai',
-    OPENAI_API_KEY: 'test-key',
-    OPENAI_MODEL: 'gpt-5-mini'
+    GROQ_API_KEY: 'test-key'
   });
   assert.equal(healthy.statusCode, 200);
   assert.equal(healthy.payload.configured, true);
-  assert.equal(healthy.payload.model, 'gpt-5-mini');
+  assert.equal(healthy.payload.provider, 'groq');
+  assert.equal(healthy.payload.model, 'llama-3.3-70b-versatile');
 
   const unhealthy = await callHealth({
-    AI_PROVIDER: 'openai',
-    OPENAI_API_KEY: 'test-key',
-    OPENAI_MODEL: 'gpt-5.4-mini'
+    AI_PROVIDER: 'groq'
   });
   assert.equal(unhealthy.statusCode, 500);
   assert.equal(unhealthy.payload.configured, false);

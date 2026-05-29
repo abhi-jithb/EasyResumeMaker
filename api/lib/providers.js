@@ -1,5 +1,6 @@
 const { buildImprovePrompt, buildResumePrompt } = require('./prompts');
 
+const DEFAULT_PROVIDER = 'groq';
 const DEFAULT_OPENAI_MODEL = 'gpt-5-mini';
 const DEFAULT_GROQ_MODEL = 'llama-3.3-70b-versatile';
 const SUPPORTED_OPENAI_MODELS = new Set([
@@ -26,7 +27,7 @@ function isSupportedOpenAIModel(model) {
 }
 
 function validateProviderConfig(env = process.env) {
-  const provider = (env.AI_PROVIDER || 'openai').toLowerCase();
+  const provider = (env.AI_PROVIDER || DEFAULT_PROVIDER).toLowerCase();
 
   if (provider === 'openai') {
     const model = env.OPENAI_MODEL || DEFAULT_OPENAI_MODEL;
@@ -156,7 +157,9 @@ async function improveResumeText(text) {
 }
 
 module.exports = {
+  DEFAULT_PROVIDER,
   DEFAULT_OPENAI_MODEL,
+  DEFAULT_GROQ_MODEL,
   generateResume,
   improveResumeText,
   isSupportedOpenAIModel,
