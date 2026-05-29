@@ -491,10 +491,12 @@
         const sections = [
           { id: 'about', title: 'About Me', content: d.about ? [{ type: 'text', val: d.about }] : [] },
           { id: 'exp', title: 'Experience', content: (d.experience || []).map(e => ({ type: 'entry', val: e })) },
+          { id: 'projects', title: 'Projects', content: (d.projects || []).map(p => ({ type: 'project', val: p })) },
           { id: 'ach', title: 'Achievements', content: d.achievements?.length ? [{ type: 'list', val: d.achievements }] : [] },
           { id: 'skills', title: 'Technical Skills', content: (d.skills && (d.skills.languages?.length || d.skills.tools?.length || d.skills.soft_skills?.length)) ? [{ type: 'skills', val: d.skills }] : [] },
           { id: 'langs', title: 'Languages', content: d.languages_spoken?.length ? [{ type: 'spoken', val: d.languages_spoken }] : [] },
-          { id: 'edu', title: 'Education', content: (d.education || []).map(e => ({ type: 'edu', val: e })) }
+          { id: 'edu', title: 'Education', content: (d.education || []).map(e => ({ type: 'edu', val: e })) },
+          { id: 'leadership', title: 'Leadership / Community', content: (d.leadership_community || []).map(e => ({ type: 'leadership', val: e })) }
         ];
 
         sections.forEach(sec => {
@@ -533,6 +535,25 @@
                 doc.text(pLines, lm, y); y += pLines.length * (isCompact ? 3.6 : 4.5) + 1;
               });
               y += isCompact ? 2 : 3;
+            } else if (item.type === 'project') {
+              const p = item.val;
+              doc.setFont('helvetica', 'bold'); doc.setFontSize(isCompact ? 9.2 : 10.5); doc.setTextColor(20, 20, 20);
+              doc.text(p.name || 'Project', lm, y); y += isCompact ? 4 : 5;
+              if (p.tech) {
+                doc.setFont('times', 'italic'); doc.setFontSize(isCompact ? 8.8 : 10); doc.setTextColor(80, 80, 80);
+                const techLines = doc.splitTextToSize(p.tech, pw);
+                doc.text(techLines, lm, y); y += techLines.length * (isCompact ? 3.8 : 4.8) + 1;
+              }
+              if (p.description) {
+                doc.setFont('helvetica', 'normal'); doc.setFontSize(isCompact ? 8.5 : 9.5); doc.setTextColor(50, 50, 50);
+                const descLines = doc.splitTextToSize(p.description, pw);
+                doc.text(descLines, lm, y); y += descLines.length * (isCompact ? 3.6 : 4.5) + 1;
+              }
+              (p.points || []).forEach(point => {
+                const pLines = doc.splitTextToSize('• ' + point, pw - 5);
+                doc.text(pLines, lm, y); y += pLines.length * (isCompact ? 3.6 : 4.5) + 1;
+              });
+              y += isCompact ? 2 : 3;
             } else if (item.type === 'list') {
               doc.setFont('helvetica', 'normal'); doc.setFontSize(isCompact ? 8.5 : 9.5); doc.setTextColor(50, 50, 50);
               item.val.forEach(a => {
@@ -560,6 +581,22 @@
               if (e.duration) { doc.setFont('times', 'italic'); doc.setFontSize(isCompact ? 8 : 9); doc.text(e.duration, rm, y, { align: 'right' }); }
               y += isCompact ? 4 : 5;
               doc.setFont('times', 'italic'); doc.setFontSize(isCompact ? 8.8 : 10); doc.text(e.institution || '', lm, y); y += isCompact ? 4 : 6;
+            } else if (item.type === 'leadership') {
+              const e = item.val;
+              doc.setFont('helvetica', 'bold'); doc.setFontSize(isCompact ? 9.2 : 10.5); doc.setTextColor(20, 20, 20);
+              doc.text(e.role || 'Leadership', lm, y);
+              if (e.duration) { doc.setFont('times', 'italic'); doc.setFontSize(isCompact ? 8 : 9); doc.text(e.duration, rm, y, { align: 'right' }); }
+              y += isCompact ? 4 : 5;
+              if (e.organization) {
+                doc.setFont('times', 'italic'); doc.setFontSize(isCompact ? 8.8 : 10); doc.setTextColor(80, 80, 80);
+                doc.text(e.organization, lm, y); y += isCompact ? 4 : 5;
+              }
+              doc.setFont('helvetica', 'normal'); doc.setFontSize(isCompact ? 8.5 : 9.5); doc.setTextColor(50, 50, 50);
+              (e.points || []).forEach(point => {
+                const pLines = doc.splitTextToSize('• ' + point, pw - 5);
+                doc.text(pLines, lm, y); y += pLines.length * (isCompact ? 3.6 : 4.5) + 1;
+              });
+              y += isCompact ? 2 : 3;
             }
           });
           y += isCompact ? 2 : 4;
@@ -661,12 +698,27 @@
               if (item.duration) { doc.setFont('helvetica', 'italic'); doc.setFontSize(9); doc.setTextColor(100, 100, 100); doc.text(item.duration, mainX, my); my += 5; }
               doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(60, 60, 60);
               (item.points || []).forEach(p => { const ls = doc.splitTextToSize('• ' + p, mainW); doc.text(ls, mainX, my); my += ls.length * 4.5 + 1; });
+            } else if (type === 'project') {
+              doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(20, 20, 20);
+              const hLines = doc.splitTextToSize(item.name || 'Project', mainW);
+              doc.text(hLines, mainX, my); my += hLines.length * 5.5 + 1;
+              if (item.tech) { doc.setFont('helvetica', 'italic'); doc.setFontSize(9); doc.setTextColor(100, 100, 100); const ls = doc.splitTextToSize(item.tech, mainW); doc.text(ls, mainX, my); my += ls.length * 4.5 + 1; }
+              if (item.description) { doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(60, 60, 60); const ls = doc.splitTextToSize(item.description, mainW); doc.text(ls, mainX, my); my += ls.length * 4.5 + 1; }
+              (item.points || []).forEach(p => { const ls = doc.splitTextToSize('• ' + p, mainW); doc.text(ls, mainX, my); my += ls.length * 4.5 + 1; });
             } else if (type === 'edu') {
               doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(20, 20, 20);
               const header = (item.degree || '') + (item.institution ? ' · ' + item.institution : '');
               const hLines = doc.splitTextToSize(header, mainW);
               doc.text(hLines, mainX, my); my += hLines.length * 5.5 + 1;
               if (item.duration) { doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(100, 100, 100); doc.text(item.duration, mainX, my); my += 5; }
+            } else if (type === 'leadership') {
+              doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(20, 20, 20);
+              const header = (item.role || 'Leadership') + (item.organization ? ' · ' + item.organization : '');
+              const hLines = doc.splitTextToSize(header, mainW);
+              doc.text(hLines, mainX, my); my += hLines.length * 5.5 + 1;
+              if (item.duration) { doc.setFont('helvetica', 'italic'); doc.setFontSize(9); doc.setTextColor(100, 100, 100); doc.text(item.duration, mainX, my); my += 5; }
+              doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(60, 60, 60);
+              (item.points || []).forEach(p => { const ls = doc.splitTextToSize('• ' + p, mainW); doc.text(ls, mainX, my); my += ls.length * 4.5 + 1; });
             }
             my += 4;
           });
@@ -674,14 +726,24 @@
 
         const expItems = (d.experience || []).filter(e => e.role || e.organization);
         if (expItems.length) { mainSection('Experience'); mainEntry(expItems, 'exp'); }
+        const projectItems = (d.projects || []).filter(p => p.name || p.description || p.points?.length);
+        if (projectItems.length) { mainSection('Projects'); mainEntry(projectItems, 'project'); }
         if (d.achievements?.length) {
           mainSection('Achievements');
           doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(60, 60, 60);
           d.achievements.forEach(a => { const ls = doc.splitTextToSize('• ' + a, mainW); doc.text(ls, mainX, my); my += ls.length * 4.5 + 1; });
           my += 4;
         }
+        if (d.languages_spoken?.length) {
+          mainSection('Languages');
+          doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(60, 60, 60);
+          const ls = doc.splitTextToSize(d.languages_spoken.join('  —  '), mainW);
+          doc.text(ls, mainX, my); my += ls.length * 4.5 + 4;
+        }
         const eduItems = (d.education || []).filter(e => e.degree);
         if (eduItems.length) { mainSection('Education'); mainEntry(eduItems, 'edu'); }
+        const leadershipItems = (d.leadership_community || []).filter(e => e.role || e.organization || e.points?.length);
+        if (leadershipItems.length) { mainSection('Leadership / Community'); mainEntry(leadershipItems, 'leadership'); }
 
         // ── Template: CLASSIC ──
       } else {
@@ -702,7 +764,8 @@
         doc.setTextColor(...A);
         doc.text(d.title || '', lm + 8, y); y += 7;
 
-        const contact = [d.email, d.phone, d.location, d.website].filter(Boolean).join('  ·  ');
+        const c = d.contact || {};
+        const contact = [c.email, c.phone, c.location, ...(c.links || [])].filter(Boolean).join('  ·  ');
         doc.setFont('courier', 'normal');
         doc.setFontSize(8);
         doc.setTextColor(120, 100, 80);
@@ -730,7 +793,7 @@
               doc.setFont('helvetica', 'bold');
               doc.setFontSize(11);
               doc.setTextColor(30, 20, 10);
-              const h = type === 'exp' ? (item.role || '') + (item.company ? ' · ' + item.company : '') : item.name || '';
+              const h = type === 'exp' ? (item.role || '') + (item.organization ? ' · ' + item.organization : '') : item.name || '';
               const hLines = doc.splitTextToSize(h, pw - 10);
               doc.text(hLines, lm, y); y += hLines.length * 5.5 + 0.5;
 
@@ -746,6 +809,11 @@
                 const ls = doc.splitTextToSize(desc, pw - 10);
                 doc.text(ls, lm, y); y += ls.length * 4.8 + 5;
               }
+              doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(70, 55, 40);
+              (item.points || []).forEach(point => {
+                const ls = doc.splitTextToSize('• ' + point, pw - 10);
+                doc.text(ls, lm, y); y += ls.length * 4.8 + 1;
+              });
             } else if (type === 'edu') {
               doc.setFont('helvetica', 'bold');
               doc.setFontSize(11);
@@ -753,47 +821,83 @@
               const header = (item.degree || '') + (item.institution ? ' · ' + item.institution : '');
               const hLines = doc.splitTextToSize(header, pw - 10);
               doc.text(hLines, lm, y); y += hLines.length * 5 + 0.5;
-              if (item.year) {
+              if (item.duration) {
                 doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(150, 120, 100);
-                doc.text(item.year, lm, y); y += 5;
+                doc.text(item.duration, lm, y); y += 5;
               }
+            } else if (type === 'leadership') {
+              doc.setFont('helvetica', 'bold');
+              doc.setFontSize(11);
+              doc.setTextColor(30, 20, 10);
+              const header = (item.role || 'Leadership') + (item.organization ? ' · ' + item.organization : '');
+              const hLines = doc.splitTextToSize(header, pw - 10);
+              doc.text(hLines, lm, y); y += hLines.length * 5 + 0.5;
+              if (item.duration) {
+                doc.setFont('helvetica', 'italic'); doc.setFontSize(9); doc.setTextColor(150, 120, 100);
+                doc.text(item.duration, lm, y); y += 5;
+              }
+              doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(70, 55, 40);
+              (item.points || []).forEach(point => {
+                const ls = doc.splitTextToSize('• ' + point, pw - 10);
+                doc.text(ls, lm, y); y += ls.length * 4.8 + 1;
+              });
             }
           });
           y += 2;
         };
 
-        if (d.summary) {
+        if (d.about) {
           clsSection('Profile');
           doc.setFont('times', 'italic');
           doc.setFontSize(10.5);
           doc.setTextColor(70, 55, 40);
-          const ls = doc.splitTextToSize(d.summary, pw);
+          const ls = doc.splitTextToSize(d.about, pw);
           doc.text(ls, lm, y); y += ls.length * 5 + 6;
         }
 
-        const expItems = (d.experience || []).filter(e => e.role || e.company);
+        const expItems = (d.experience || []).filter(e => e.role || e.organization || e.points?.length);
         if (expItems.length) { clsSection('Experience'); clsEntry(expItems, 'exp'); }
-        const projItems = (d.projects || []).filter(p => p.name);
+        const projItems = (d.projects || []).filter(p => p.name || p.description || p.points?.length);
         if (projItems.length) { clsSection('Projects'); clsEntry(projItems, 'proj'); }
-        const eduItems = (d.education || []).filter(e => e.degree);
-        if (eduItems.length) { clsSection('Education'); clsEntry(eduItems, 'edu'); }
-        if (d.skills?.length) {
+        if (d.achievements?.length) {
+          clsSection('Achievements');
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(10);
+          doc.setTextColor(70, 55, 40);
+          d.achievements.forEach(item => {
+            const ls = doc.splitTextToSize('• ' + item, pw - 10);
+            doc.text(ls, lm, y); y += ls.length * 4.8 + 1;
+          });
+          y += 4;
+        }
+        const sk = d.skills || {};
+        if (sk.languages?.length || sk.tools?.length || sk.soft_skills?.length) {
           clsSection('Skills');
           doc.setFont('helvetica', 'normal');
           doc.setFontSize(10);
           doc.setTextColor(70, 55, 40);
-          const ls = doc.splitTextToSize(d.skills.join('  ·  '), pw - 10);
+          [
+            sk.languages?.length ? `Languages: ${sk.languages.join(', ')}` : '',
+            sk.tools?.length ? `Tools: ${sk.tools.join(', ')}` : '',
+            sk.soft_skills?.length ? `Soft Skills: ${sk.soft_skills.join(', ')}` : ''
+          ].filter(Boolean).forEach(line => {
+            const ls = doc.splitTextToSize(line, pw - 10);
+            doc.text(ls, lm, y); y += ls.length * 5 + 1;
+          });
+          y += 4;
+        }
+        if (d.languages_spoken?.length) {
+          clsSection('Languages');
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(10);
+          doc.setTextColor(70, 55, 40);
+          const ls = doc.splitTextToSize(d.languages_spoken.join('  —  '), pw - 10);
           doc.text(ls, lm, y); y += ls.length * 5.5 + 6;
         }
-        if (d.links && Object.values(d.links).some(Boolean)) {
-          clsSection('Links');
-          doc.setFont('courier', 'normal');
-          doc.setFontSize(8.5);
-          doc.setTextColor(100, 80, 60);
-          const linkStr = Object.entries(d.links).filter(([k, v]) => v).map(([k, v]) => `${k}: ${v}`).join('  ·  ');
-          const ls = doc.splitTextToSize(linkStr, pw - 10);
-          doc.text(ls, lm, y);
-        }
+        const eduItems = (d.education || []).filter(e => e.degree || e.institution);
+        if (eduItems.length) { clsSection('Education'); clsEntry(eduItems, 'edu'); }
+        const leadershipItems = (d.leadership_community || []).filter(e => e.role || e.organization || e.points?.length);
+        if (leadershipItems.length) { clsSection('Leadership / Community'); clsEntry(leadershipItems, 'leadership'); }
       }
 
       doc.save(window.EasyResumePdf.buildResumeFilename(d.name, tpl));
