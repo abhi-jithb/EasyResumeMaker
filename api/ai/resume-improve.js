@@ -22,6 +22,9 @@ module.exports = async function handler(req, res) {
     const result = await improveResumeText(text.trim().slice(0, 1200));
     return sendJson(res, 200, result);
   } catch (error) {
+    if (error.code === 'invalid_json') {
+      return sendError(res, 400, 'invalid_json', error.message);
+    }
     if (error.code === 'server_misconfigured') {
       return sendError(res, 500, 'server_misconfigured', error.message);
     }
