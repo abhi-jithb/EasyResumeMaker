@@ -55,6 +55,7 @@
       el.setAttribute('aria-checked', 'true');
       selectedTemplate = el.dataset.tpl;
       updateResultTemplateLabel();
+      window.EasyResumeAnalytics.track('template_selected', { template: selectedTemplate });
       if (resumeData) {
         showToast(`PDF template set to ${getTemplateName(selectedTemplate)}.`);
       }
@@ -135,6 +136,11 @@
 
       const normalizedUrl = window.EasyResumeUrl.normalizePublicUrl(url);
       if (!normalizedUrl.ok) { showError(normalizedUrl.message); return; }
+      const source = window.EasyResumeSource.detectSource(normalizedUrl.url);
+      window.EasyResumeAnalytics.track('generate_started', {
+        template: selectedTemplate,
+        source_type: source.type
+      });
       hideError();
 
       const fullUrl = normalizedUrl.url;
@@ -157,12 +163,14 @@
         rawText = rawText.slice(0, 30000); // Increased limit for better details
       } catch (e) {
         setStage('stage-fetch', 'waiting', 'failed ✗');
+        window.EasyResumeAnalytics.track('generate_failed', { stage: 'fetch', error_code: 'fetch_failed', source_type: source.type });
         showError(window.EasyResumeErrors.fetchErrorMessage(e));
         setGenerateButtonState('idle');
         return;
       }
       if (rawText.length < 300) {
         setStage('stage-fetch', 'waiting', 'failed ✗');
+        window.EasyResumeAnalytics.track('generate_failed', { stage: 'fetch', error_code: 'low_content', source_type: source.type });
         showError(window.EasyResumeErrors.lowContentMessage(rawText.length));
         setGenerateButtonState('idle');
         return;
@@ -181,6 +189,7 @@
 
       } catch (e) {
         setStage('stage-parse', 'waiting', 'failed ✗');
+        window.EasyResumeAnalytics.track('generate_failed', { stage: 'parse', error_code: e.code || 'ai_failed', source_type: source.type });
         showError('AI parsing failed. ' + getFriendlyApiError(e));
         setGenerateButtonState('idle');
         return;
@@ -204,6 +213,7 @@
       document.getElementById('result-section').style.display = 'block';
       document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
       setGenerateButtonState('idle');
+      window.EasyResumeAnalytics.track('resume_generated', { template: selectedTemplate, source_type: source.type });
     }
 
     function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
@@ -787,6 +797,7 @@
       }
 
       doc.save(window.EasyResumePdf.buildResumeFilename(d.name, tpl));
+      window.EasyResumeAnalytics.track('pdf_downloaded', { template: tpl });
 
       // Automatically show feedback modal after download
       setTimeout(() => {
@@ -852,6 +863,7 @@
       }
 
       improveBtn.disabled = true;
+      window.EasyResumeAnalytics.track('resume_improve_started');
       improveBtn.textContent = 'Improving...';
       copyBtn.disabled = true;
       output.style.display = 'block';
@@ -862,8 +874,10 @@
         output.textContent = result.improvedText;
         output.dataset.improvedText = result.improvedText;
         copyBtn.disabled = false;
+        window.EasyResumeAnalytics.track('resume_improved');
       } catch (error) {
         output.textContent = getFriendlyApiError(error);
+        window.EasyResumeAnalytics.track('resume_improve_failed', { error_code: error.code || 'ai_failed' });
         showToast('Could not improve that text. Please try again.', 'error');
       } finally {
         improveBtn.disabled = false;

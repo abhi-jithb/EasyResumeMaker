@@ -7,7 +7,8 @@ assert.ok(html.includes('id="result-sub"'), 'result subtitle should be addressab
 assert.ok(app.includes('function getTemplateName(template)'), 'template names should be centralized');
 assert.ok(app.includes("compact: 'Compact'"), 'compact template should have a display name');
 assert.ok(app.includes('function updateResultTemplateLabel()'), 'result template label should be updateable');
-assert.ok(app.includes('updateResultTemplateLabel();\n      if (resumeData)'), 'template switching should update generated result state');
+assert.ok(app.includes('updateResultTemplateLabel();'), 'template switching should update generated result state');
+assert.ok(app.includes('if (resumeData)'), 'template switching should detect generated result state');
 assert.ok(app.includes('PDF template set to'), 'template switching should show user feedback');
 
 console.log('template switching tests passed');
