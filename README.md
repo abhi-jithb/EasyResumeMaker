@@ -78,7 +78,7 @@ Set these in Vercel:
 ```bash
 AI_PROVIDER=openai
 OPENAI_API_KEY=your_openai_key
-OPENAI_MODEL=gpt-5.4-mini
+OPENAI_MODEL=gpt-5-mini
 ```
 
 Optional future Groq support:
@@ -88,6 +88,53 @@ AI_PROVIDER=groq
 GROQ_API_KEY=your_groq_key
 GROQ_MODEL=llama-3.3-70b-versatile
 ```
+
+`gpt-5-mini` is the default OpenAI model because it is documented for the OpenAI Responses API and is appropriate for well-defined extraction and rewrite tasks. Unsupported OpenAI model names fail the health check and AI endpoints with a server configuration error.
+
+### Local environment
+
+For full local AI flows, install the Vercel CLI and create a local env file:
+
+```bash
+vercel env pull .env.local
+```
+
+Or create `.env.local` manually for local testing:
+
+```bash
+AI_PROVIDER=openai
+OPENAI_API_KEY=your_openai_key
+OPENAI_MODEL=gpt-5-mini
+```
+
+Then run:
+
+```bash
+vercel dev
+```
+
+Open `/api/health` locally before testing generation. A healthy response includes `configured: true`, the selected provider, and the selected model.
+
+### Vercel deployment
+
+Set production and preview environment variables in Vercel Project Settings:
+
+- `AI_PROVIDER=openai`
+- `OPENAI_API_KEY`
+- `OPENAI_MODEL=gpt-5-mini`
+
+After deployment, verify:
+
+- `GET /api/health`
+- `POST /api/ai/resume-generate`
+- `POST /api/ai/resume-improve`
+
+### Security guidance
+
+- Never expose `OPENAI_API_KEY` or `GROQ_API_KEY` in client-side JavaScript.
+- Do not commit `.env`, `.env.local`, API keys, generated resumes, raw scraped page content, or AI responses.
+- Keep AI calls behind `/api/*` serverless routes.
+- Avoid logging raw URLs, names, emails, resume text, or provider responses.
 
 ## Local Development
 
@@ -122,9 +169,12 @@ node tests/api-validation.test.js
 node tests/mobile-css.test.js
 node tests/preview-sections.test.js
 node tests/pdf-utils.test.js
+node tests/pdf-template-parity.test.js
 node tests/compact-template.test.js
 node tests/template-switching.test.js
 node tests/analytics.test.js
+node tests/provider-config.test.js
+node tests/deployment-readiness.test.js
 node tests/docs.test.js
 node tests/onboarding.test.js
 ```
