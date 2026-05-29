@@ -23,12 +23,10 @@
     if (!hostname) return { type: 'unknown', label: 'Unknown source' };
 
     if (hostname === 'github.com') return { type: 'github', label: 'GitHub profile or repository' };
-    if (hostname === 'linkedin.com') return { type: 'linkedin', label: 'LinkedIn public profile' };
     if (hostname === 'dev.to') return { type: 'devto', label: 'Dev.to profile or article' };
     if (hostname === 'hashnode.dev' || hostname.endsWith('.hashnode.dev')) return { type: 'hashnode', label: 'Hashnode profile or blog' };
-    if (hostname === 'read.cv') return { type: 'readcv', label: 'Read.cv profile' };
 
-    return { type: 'portfolio', label: 'Portfolio or public website' };
+    return { type: 'website', label: 'Portfolio, public blog, or personal website' };
   }
 
   return {

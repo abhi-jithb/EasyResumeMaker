@@ -8,6 +8,7 @@
   }
 })(typeof window !== 'undefined' ? window : globalThis, function () {
   const PRIVATE_HOSTS = new Set(['localhost', '127.0.0.1', '0.0.0.0', '::1']);
+  const UNSUPPORTED_HOSTS = new Set(['linkedin.com', 'www.linkedin.com']);
 
   function isPrivateIPv4(hostname) {
     const parts = hostname.split('.').map(Number);
@@ -49,6 +50,10 @@
     }
 
     const hostname = parsed.hostname.toLowerCase();
+    if (UNSUPPORTED_HOSTS.has(hostname)) {
+      return { ok: false, message: 'That source is not supported. Use a GitHub profile, public portfolio, Dev.to, Hashnode, public blog, or personal website instead.' };
+    }
+
     if (PRIVATE_HOSTS.has(hostname) || isPrivateIPv4(hostname)) {
       return { ok: false, message: 'Use a public URL, not a localhost or private network address.' };
     }

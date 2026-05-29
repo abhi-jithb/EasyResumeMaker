@@ -6,9 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EasyResume Maker — Pro PDF Resume from Any Portfolio or URL, Instantly</title>
   <meta name="description"
-    content="Turn your portfolio, GitHub, or LinkedIn into a professional PDF resume in seconds. AI-powered extraction, zero forms, zero friction. The easiest resume maker for developers and designers.">
+    content="Turn your portfolio, GitHub, Dev.to, Hashnode, blog, or public personal website into a professional PDF resume in seconds. AI-powered extraction, zero forms, zero friction. The easiest resume maker for developers and designers.">
   <meta name="keywords"
-    content="resume maker, easy resume, site to resume, portfolio to resume, AI resume generator, free PDF resume, GitHub to resume, LinkedIn to resume, developer resume, designer portfolio, resume from URL, best online resume maker, portfolio builder, resume from portfolio site, easyresume.tech, PDF resume maker">
+    content="resume maker, easy resume, site to resume, portfolio to resume, AI resume generator, free PDF resume, GitHub to resume, Dev.to to resume, Hashnode to resume, developer resume, designer portfolio, resume from URL, best online resume maker, portfolio builder, resume from portfolio site, easyresume.tech, PDF resume maker">
   <meta name="author" content="EasyResume Maker">
   <meta name="robots" content="index, follow">
   <meta property="og:title" content="EasyResume Maker — Beautiful Resumes from any URL">
@@ -27,7 +27,7 @@
   "@context": "https://schema.org",
   "@type": "WebApplication",
   "name": "EasyResume Maker",
-  "description": "AI-powered resume generator that turns any public portfolio, GitHub, or LinkedIn URL into a professional PDF resume instantly.",
+  "description": "AI-powered resume generator that turns a public portfolio, GitHub, Dev.to, Hashnode, blog, or personal website URL into a professional PDF resume instantly.",
   "url": "https://easyresumemaker.tech",
   "applicationCategory": "Productivity",
   "operatingSystem": "Any",
@@ -74,7 +74,7 @@
     <section class="hero">
       <div class="eyebrow">AI-powered · zero friction</div>
       <h1>Your link.<br><em>Your resume.</em><br>Instantly.</h1>
-      <p class="sub">Paste any public portfolio, GitHub, or LinkedIn URL. We extract your story and craft a beautiful,
+      <p class="sub">Paste any public portfolio, GitHub, Dev.to, Hashnode, blog, or personal website URL. We extract your story and craft a beautiful,
         downloadable PDF resume — no forms, no accounts, no drag-and-drop.</p>
     </section>
 
@@ -171,7 +171,7 @@
         <div class="url-inner">
           <span class="url-prefix" aria-hidden="true">https://</span>
           <input class="url-field" id="url-input" type="url"
-            placeholder="yourportfolio.com  ·  github.com/you  ·  linkedin.com/in/you"
+            placeholder="yourportfolio.com  ·  github.com/you  ·  dev.to/you"
             aria-label="Your public portfolio or profile URL" autocomplete="url" spellcheck="false">
           <button class="go-btn" id="go-btn" onclick="generateResume()" aria-label="Generate resume">
             Generate →
@@ -180,12 +180,10 @@
       </div>
       <div class="hints" role="list" aria-label="Example URLs">
         <span class="hint" role="listitem" onclick="fillHint('github.com/torvalds')" tabindex="0">GitHub profile</span>
-        <span class="hint" role="listitem" onclick="fillHint('linkedin.com/in/satyanadella')"
-          tabindex="0">LinkedIn</span>
         <span class="hint" role="listitem" onclick="fillHint('yourname.dev')" tabindex="0">Portfolio site</span>
         <span class="hint" role="listitem" onclick="fillHint('dev.to/username')" tabindex="0">Dev.to</span>
         <span class="hint" role="listitem" onclick="fillHint('hashnode.dev/@you')" tabindex="0">Hashnode</span>
-        <span class="hint" role="listitem" onclick="fillHint('read.cv/username')" tabindex="0">Read.cv</span>
+        <span class="hint" role="listitem" onclick="fillHint('yourblog.com')" tabindex="0">Public blog</span>
       </div>
       <div class="source-hint" id="source-hint" aria-live="polite"></div>
     </div>
@@ -299,9 +297,9 @@
           What URLs does EasyResume Maker support?
           <span class="faq-arrow">›</span>
         </div>
-        <div class="faq-a">Any publicly accessible URL works — personal portfolio sites, GitHub profiles, LinkedIn
-          profiles (public), Dev.to, Hashnode, Read.cv, personal blogs, Behance, and more. If the page is publicly
-          viewable, we can read it.</div>
+        <div class="faq-a">Supported sources are public portfolio sites, GitHub profiles or repositories, Dev.to,
+          Hashnode, public blogs, and public personal websites. The page must have visible text that can be read without
+          login.</div>
       </div>
 
       <div class="faq-item">
@@ -334,11 +332,11 @@
 
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">
-          Does this work with LinkedIn?
+          Which sources work best?
           <span class="faq-arrow">›</span>
         </div>
-        <div class="faq-a">LinkedIn blocks most automated scrapers. For best results, use your personal portfolio site,
-          a GitHub profile, a Read.cv, or Dev.to/Hashnode blog. LinkedIn export works partially on public profiles.
+        <div class="faq-a">For best results, use your personal portfolio site, GitHub profile or repository, Dev.to,
+          Hashnode, public blog, or public personal website with visible project, skill, and experience text.
         </div>
       </div>
 
@@ -348,8 +346,8 @@
       <div class="footer-links">
         <a href="https://easyresumemaker.tech">EasyResume Maker</a>
         <a href="https://github.com/abhi-jithb/EasyResumeMaker.git">Free & Open Source</a>
-        <a href="https://www.linkedin.com/in/abhi-jithb" target="_blank" rel="noopener">Abhijith B</a>
-        <a href="https://platform.openai.com/docs" target="_blank" rel="noopener">AI powered</a>
+        <a href="https://github.com/abhi-jithb" target="_blank" rel="noopener">Abhijith B</a>
+        <a href="https://console.groq.com/docs" target="_blank" rel="noopener">AI powered</a>
       </div>
       <div>Built for developers, designers & everyone in between · Zero data collected · Your resume, your data</div>
     </footer>

@@ -21,6 +21,7 @@ const invalidCases = [
   'localhost:3000',
   '127.0.0.1:8080',
   '192.168.1.10/profile',
+  'linkedin.com/in/example',
   'portfolio'
 ];
 
