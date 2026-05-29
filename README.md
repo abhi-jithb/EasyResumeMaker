@@ -1,176 +1,167 @@
-# EasyResume Maker 🚀
-> **Paste your portfolio link. Get a professional PDF resume. Instantly.**
-<img width="883" height="484" alt="sc" src="https://github.com/user-attachments/assets/b9a41121-78c4-48b1-856f-12c57b25c2f6" />
+# EasyResume Maker
 
-*EasyResume Maker* is a zero-friction, AI-powered resume generator. 
-Paste any public URL — portfolio site, GitHub profile, LinkedIn, Dev.to, 
-or personal blog — and get a clean, downloadable PDF resume in seconds.
+> Paste your portfolio link. Get a professional PDF resume. Instantly.
 
-3 templates · Groq AI (Gemini soon) · 100% client-side · FeedBack system · No data collected
+EasyResume Maker is a low-friction, AI-powered resume generator. Paste any public URL, choose a template, generate a clean resume preview, and download a PDF.
 
----
+V2 keeps the app static and lightweight while moving AI credentials behind a small server-side API layer. Users no longer need to bring their own API key.
 
-## ✨ Features
+## Features
 
-- **One URL → One Resume** — paste any public link and go
-- **3 beautiful templates** — Minimal, Modern (two-column), Classic (warm serif)
-- **AI-powered extraction** — uses Groq (llama-3.3-70b) or Gemini 1.5 Flash
-- **Client-side PDF** — generated entirely in your browser via jsPDF
-- **Zero data collection** — your API key and data never touch our servers
-- **SEO optimised** — schema.org structured data, Open Graph, meta tags
-- **Fully responsive** — works on mobile, tablet, desktop
-- **Accessible** — ARIA labels, keyboard navigation, live regions
-- **4-stage loading UI** — each stage visually aligned to what's actually happening
-- **FAQ section** — SEO-rich content that answers real user questions
-- **Feedback System** — integrated via Formspree for user suggestions
+- One URL to resume generation
+- No user API key required
+- Malformed and private URLs are rejected before scraping
+- ATS-friendly prompt rules for summaries, projects, bullets, and section ordering
+- Server-side AI calls using environment variables
+- OpenAI as the default AI provider
+- Groq-compatible provider abstraction for future use
+- AI Resume Improver for polishing rough resume sentences
+- 3 PDF templates: Minimal, Modern, Classic
+- Client-side PDF generation with jsPDF
+- Feedback modal via Formspree
+- Vercel Insights support
 
----
+## Tech Stack
 
-## 🛠 Tech Stack
+| Layer | Tool |
+|---|---|
+| Frontend | Plain HTML, CSS, JavaScript |
+| Static entry | `index.html` |
+| AI API | Vercel serverless functions |
+| Default AI provider | OpenAI Responses API |
+| Future provider | Groq |
+| Web scraping | Jina Reader API |
+| PDF | jsPDF |
+| Hosting | Vercel recommended |
 
-| Layer | Tool | Why |
-|---|---|---|
-| Frontend | Plain HTML/CSS/JS | Zero build step, instant deploy anywhere |
-| Web Scraping | [Jina Reader API](https://jina.ai/reader/) | Free, handles JS-heavy sites, no auth needed |
-| AI (fast) | [Groq](https://groq.com) — llama-3.3-70b | Fastest inference, free tier, JSON mode |
-| AI (alt) | [Gemini 1.5 Flash](https://ai.google.dev) | Google's free tier alternative |
-| PDF | [jsPDF](https://github.com/parallax/jsPDF) | Client-side, no server, excellent quality |
-| Fonts | DM Serif Display + Syne + DM Mono | Distinctive editorial aesthetic |
-| Hosting | Any static host | Vercel, Netlify, GitHub Pages — all work |
+## Project Structure
 
----
-
-## 🚀 Getting Started
-
-### Option 1 — Open directly
-Just open `index.html` in your browser. Done. No install, no build.
-
-```bash
-git clone https://github.com/abhi-jithb/EasyResumeMaker.git
-cd easyresume-maker
-open index.html   # macOS
-# or
-xdg-open index.html   # Linux
+```text
+EasyResumeMaker/
+├── index.html
+├── assets/
+│   ├── css/
+│   │   └── styles.css
+│   └── js/
+│       ├── app.js
+│       ├── ai-client.js
+│       ├── resume-renderer.js
+│       ├── pdf-generator.js
+│       └── ui.js
+├── api/
+│   ├── ai/
+│   │   ├── resume-generate.js
+│   │   └── resume-improve.js
+│   ├── lib/
+│   │   ├── providers.js
+│   │   ├── prompts.js
+│   │   ├── rate-limit.js
+│   │   └── responses.js
+│   └── health.js
+├── docs/
+│   └── github-issues-v2-phase-1.md
+├── vercel.json
+└── netlify.toml
 ```
 
-### Option 2 — Deploy to Vercel (recommended)
+## Environment Variables
+
+Set these in Vercel:
+
+```bash
+AI_PROVIDER=openai
+OPENAI_API_KEY=your_openai_key
+OPENAI_MODEL=gpt-5.4-mini
+```
+
+Optional future Groq support:
+
+```bash
+AI_PROVIDER=groq
+GROQ_API_KEY=your_groq_key
+GROQ_MODEL=llama-3.3-70b-versatile
+```
+
+## Local Development
+
+The static UI can still be opened directly:
+
+```bash
+open index.html
+```
+
+AI features require serverless API routes, so use Vercel locally for the full flow:
 
 ```bash
 npm install -g vercel
-vercel --prod
+vercel dev
 ```
 
-### Option 3 — Deploy to Netlify
-Drag and drop the `index.html` file at [netlify.com/drop](https://netlify.com/drop).
+Then open the local URL printed by Vercel.
 
-### Option 4 — GitHub Pages
-Push to a repo, enable GitHub Pages from Settings → Pages → main branch.
+## Tests
 
----
+Run focused utility tests with Node:
 
-## 🔑 Getting API Keys
-
-### Groq (Recommended — Fastest)
-1. Go to [console.groq.com](https://console.groq.com)
-2. Sign up for free (takes 30 seconds)
-3. Click **API Keys** → **Create API Key**
-4. Copy and paste into EasyResume Maker
-
-Groq's free tier allows hundreds of resume generations per day.
-
-### Gemini (Coming in Next Update)
-*Gemini integration is currently undergoing maintenance to support the latest v1 stable API. Groq is the recommended provider for now.*
-
----
-
-## 📂 Project Structure
-
-```
-easyresume-maker/
-├── index.html          # The entire app — one file
-├── README.md           # This file
-├── LICENSE             # MIT License
-└── og-image.png        # (optional) Open Graph image for social sharing
+```bash
+node tests/url-utils.test.js
+node tests/prompt-rules.test.js
 ```
 
----
+Resume generation quality rules are documented in `docs/ats-optimization-rules.md`.
 
-## 🎨 Templates
+## API Endpoints
 
-| Template | Style | Best For |
-|---|---|---|
-| **Minimal** | Clean white, serif headings, elegant spacing | Designers, writers, general use |
-| **Modern** | Dark sidebar, two-column, yellow accent | Developers, tech roles |
-| **Classic** | Warm tones, terracotta accent, traditional | Business, academia, senior roles |
+### `POST /api/ai/resume-generate`
 
----
+Input:
 
-## 🌐 Supported URLs
+```json
+{ "rawText": "..." }
+```
 
-| Source | Works? | Notes |
-|---|---|---|
-| Personal portfolio sites (static/SSG) | ✅ Best | Most info, cleanest extraction |
-| GitHub profiles | ✅ Great | Pulls bio, repos, skills |
-| Dev.to profiles | ⚠️ Partial | Jina Reader returns HTTP 400 for some Dev.to URLs |
-| Hashnode blogs | ✅ Great | — |
-| Read.cv | ✅ Great | Purpose-built for this use case |
-| LinkedIn | ⚠️ Limited | Returns ~127 chars (JS-blocked) — triggers low-content warning |
-| Behance | ✅ Good | Project descriptions extracted |
-| Medium | ⚠️ Limited | @username pages return ~246 chars — triggers low-content warning |
-| React portfolio sites | ✅ Usually works | Jina extracts static HTML shell; results vary by site |
-| Next.js portfolio sites | ⚠️ Partial | Some content extracted but resume may be sparse (e.g. leerob.io) |
-| Vue / Nuxt portfolio sites | ⚠️ Limited | JS-rendered — little content extracted; prefer GitHub or Dev.to |
-| Angular portfolio sites | ⚠️ Limited | JS-rendered — prefer a static alternative |
-| Astro / SvelteKit sites | ✅ Usually works | Mostly pre-rendered HTML; extraction typically succeeds |
+Output: the existing resume JSON schema consumed by the preview and PDF generator.
 
-> **Why do some sites fail?** Sites that load content via JavaScript (React, Next.js, Vue, Angular) may return fewer than 300 characters to Jina Reader — not enough to build a resume. The app will show a specific warning with suggested alternatives instead of passing empty input to the AI. LinkedIn actively blocks scrapers and consistently returns < 300 chars.
+### `POST /api/ai/resume-improve`
 
----
+Input:
 
-## 🔒 Privacy
+```json
+{ "text": "Built a Flutter app for attendance." }
+```
 
-- **Your API key** is used only in your browser session. It is sent directly from your browser to Groq/Google's servers. We never see it.
-- **Your URL content** is fetched via Jina Reader API and sent to the AI for parsing. It is not stored anywhere.
-- **No cookies**, no analytics, no tracking.
-- **No account** required.
+Output:
 
----
+```json
+{
+  "improvedText": "Developed a Flutter-based attendance management application that streamlined attendance tracking and reporting."
+}
+```
 
-## 🛣 Roadmap
+## Privacy
 
-- [ ] 2 more templates (Compact, Creative)
-- [ ] Multi-URL support (merge GitHub + LinkedIn + portfolio)
-- [ ] "Edit before download" — in-browser resume editing
-- [ ] ATS score checker
-- [ ] Dark/light mode toggle
-- [ ] Share resume link (optional)
-- [ ] Custom colour picker per template
+- Users do not provide API keys.
+- AI provider credentials live only in deployment environment variables.
+- Public URL content is fetched through Jina Reader and sent to the configured AI provider for resume generation.
+- Resume Improver text is sent to the configured AI provider for rewriting.
+- Do not log raw resume content, URLs, names, emails, or generated AI responses.
+- Vercel Insights may collect privacy-preserving usage metrics.
 
----
+## Roadmap
 
-## 🤝 Contributing
+- Durable rate limiting with Upstash or Vercel KV
+- Full extraction of preview and PDF logic from `app.js`
+- ATS checker
+- Job description matcher
+- Multi-URL resume builder
+- Optional Groq provider exposure
 
-PRs welcome! This is a single-file project by design — all contributions should stay within `index.html` unless there's a strong reason not to.
+## Contributing
 
-1. Fork the repo
-2. Make your changes in `index.html`
-3. Test by opening in a browser with a real API key
-4. Submit a PR with a clear description
+PRs are welcome. Keep the app static, avoid framework migrations, and preserve the existing URL-to-PDF flow unless an issue explicitly asks for a flow change.
 
----
+See `Contributing.md` and `docs/github-issues-v2-phase-1.md` for task-ready contribution ideas.
 
-## 📄 License
+## License
 
-MIT — free to use, modify, and distribute.
-
----
-
-## 💬 The Story
-
-Built to solve a real problem: resumes are annoying to update. If you already have a portfolio, a GitHub, or a LinkedIn — your story is already written. EasyResume Maker just formats it.
-
-Inspired by the simplicity of README generators: paste your details, get the output, done.
-
----
-
-*Built with ♥ by [Abhijith](https://www.linkedin.com/in/abhi-jithb) for developers, designers, and everyone who's stared at a blank resume template at midnight.*
+MIT

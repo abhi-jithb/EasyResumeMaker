@@ -37,13 +37,14 @@ EasyResume Maker turns any public URL — a portfolio, GitHub profile, LinkedIn 
 
 **Tech stack (it's simple on purpose):**
 
-- Pure HTML / CSS / JavaScript — no framework, no build step
+- Pure HTML / CSS / JavaScript — no framework, no frontend build step
 - [Jina Reader API](https://jina.ai/reader/) — scrapes any public URL
-- [Groq API](https://console.groq.com) / [Gemini API](https://aistudio.google.com) — AI-powered data extraction
+- Vercel serverless functions — protect AI provider credentials
+- OpenAI by default, with a Groq-compatible provider layer for future use
 - [jsPDF](https://github.com/parallax/jsPDF) — client-side PDF generation
 - Google Fonts — DM Serif Display, Syne, DM Mono
 
-The entire app lives in one file: `index.html`. This is intentional — it keeps things accessible to beginners and easy to deploy anywhere.
+The app remains static and starts at `index.html`. CSS, JavaScript, and serverless API files are split into small folders so contributors can work without editing one giant file.
 
 ---
 
@@ -91,9 +92,21 @@ xdg-open index.html
 start index.html
 ```
 
-### 4. Get an API key for testing
+### 4. Configure AI credentials for full-flow testing
 
-To test the full flow, you'll need a free [Groq API key](https://console.groq.com) (takes 30 seconds). Paste it into the app when prompted. Your key is never stored or sent anywhere except directly to Groq.
+Opening `index.html` directly is enough for UI-only changes. To test AI generation and Resume Improver, run the app through Vercel and set:
+
+```bash
+AI_PROVIDER=openai
+OPENAI_API_KEY=your_openai_key
+OPENAI_MODEL=gpt-5.4-mini
+```
+
+Then start the local server:
+
+```bash
+vercel dev
+```
 
 ### 5. Create a branch for your work
 
@@ -113,7 +126,10 @@ Use a descriptive branch name:
 
 ```
 EasyResumeMaker/
-├── index.html          ← The entire app lives here
+├── index.html          ← Static app entry point
+├── assets/             ← CSS and browser JavaScript
+├── api/                ← Vercel serverless AI endpoints
+├── docs/               ← Roadmaps and issue-ready task lists
 ├── README.md           ← Project overview and setup guide
 ├── CONTRIBUTING.md     ← This file
 ├── LICENSE             ← MIT License
@@ -121,22 +137,15 @@ EasyResumeMaker/
 └── netlify.toml        ← Netlify deployment config
 ```
 
-Inside `index.html`, the code is organised into clear sections marked with comments:
+The frontend is organized across `index.html` and static assets:
 
 ```
-<!-- RESET & ROOT VARIABLES -->
-<!-- NAV -->
-<!-- HERO -->
-<!-- STEPS / HOW IT WORKS -->
-<!-- API CONFIG SECTION -->
-<!-- TEMPLATE PICKER -->
-<!-- URL INPUT -->
-<!-- LOADING STAGES -->
-<!-- RESULT SECTION -->
-<!-- FAQ SECTION -->
-<!-- FOOTER -->
-<style> ... </style>   ← All CSS
-<script> ... </script> ← All JavaScript
+index.html               ← Markup and script/style links
+assets/css/styles.css    ← All CSS
+assets/js/app.js         ← Main browser flow
+assets/js/ai-client.js   ← Calls server-side AI endpoints
+api/ai/*.js              ← Vercel AI routes
+api/lib/*.js             ← Provider, prompt, rate-limit, and response helpers
 ```
 
 **Key JavaScript functions:**
@@ -148,6 +157,7 @@ Inside `index.html`, the code is organised into clear sections marked with comme
 | `setStage(id, state, text)` | Updates loading stage indicators |
 | `renderPreview(d)` | Renders the formatted resume preview |
 | `downloadPDF()` | Generates and downloads the PDF using jsPDF |
+| `improveResumeText()` | Improves rough resume text using the AI API |
 | `startOver()` | Resets the UI to initial state |
 
 ---
