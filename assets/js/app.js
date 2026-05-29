@@ -77,16 +77,7 @@
     }
 
     function getFriendlyApiError(error) {
-      if (error?.code === 'rate_limited') {
-        return 'Too many AI requests. Please try again in a few minutes.';
-      }
-      if (error?.code === 'server_misconfigured') {
-        return 'The AI service is not configured yet. Add the required provider API key in the deployment environment.';
-      }
-      if (error?.code === 'missing_input') {
-        return 'Please add enough content for the AI to work with.';
-      }
-      return error?.message || 'Please try again.';
+      return window.EasyResumeErrors.apiErrorMessage(error);
     }
 
     // ===== MAIN GENERATOR =====
@@ -117,23 +108,13 @@
         rawText = rawText.slice(0, 30000); // Increased limit for better details
       } catch (e) {
         setStage('stage-fetch', 'waiting', 'failed ✗');
-        showError('Could not read that URL. Make sure the page is public and accessible. Error: ' + e.message);
+        showError(window.EasyResumeErrors.fetchErrorMessage(e));
         document.getElementById('go-btn').disabled = false;
         return;
       }
       if (rawText.length < 300) {
         setStage('stage-fetch', 'waiting', 'failed ✗');
-        showError(
-          'This page may be JavaScript-rendered and couldn\'t be fully read.\n' +
-          'Only ' + rawText.length + ' characters were extracted — not enough to build a resume.\n\n' +
-          'This usually happens with React, Next.js, Vue, or Angular sites where content loads via JS.\n\n' +
-          'Try one of these instead:\n' +
-          '  • github.com/your-username\n' +
-          '  • dev.to/your-username\n' +
-          '  • read.cv/your-username\n' +
-          '  • hashnode.dev/@your-username\n' +
-          '  • linkedin.com/in/your-username  (public profile)'
-        );
+        showError(window.EasyResumeErrors.lowContentMessage(rawText.length));
         document.getElementById('go-btn').disabled = false;
         return;
       }

@@ -106,6 +106,7 @@ Run focused utility tests with Node:
 ```bash
 node tests/url-utils.test.js
 node tests/prompt-rules.test.js
+node tests/error-messages.test.js
 ```
 
 Resume generation quality rules are documented in `docs/ats-optimization-rules.md`.
