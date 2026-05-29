@@ -33,14 +33,14 @@ By contributing, you agree to keep this a welcoming space for everyone.
 
 ## What We're Building
 
-EasyResume Maker turns any public URL — a portfolio, GitHub profile, LinkedIn page, or personal blog — into a professional PDF resume in seconds. No forms, no accounts, no friction.
+EasyResume Maker turns supported public URLs — GitHub profiles or repositories, portfolio websites, Dev.to, Hashnode, public blogs, and personal websites — into a professional PDF resume in seconds. No forms, no accounts, no friction.
 
 **Tech stack (it's simple on purpose):**
 
 - Pure HTML / CSS / JavaScript — no framework, no frontend build step
 - [Jina Reader API](https://jina.ai/reader/) — scrapes any public URL
 - Vercel serverless functions — protect AI provider credentials
-- OpenAI by default, with a Groq-compatible provider layer for future use
+- Groq by default, with provider credentials protected in serverless functions
 - [jsPDF](https://github.com/parallax/jsPDF) — client-side PDF generation
 - Google Fonts — DM Serif Display, Syne, DM Mono
 
@@ -97,9 +97,9 @@ start index.html
 Opening `index.html` directly is enough for UI-only changes. To test AI generation and Resume Improver, run the app through Vercel and set:
 
 ```bash
-AI_PROVIDER=openai
-OPENAI_API_KEY=your_openai_key
-OPENAI_MODEL=gpt-5.4-mini
+AI_PROVIDER=groq
+GROQ_API_KEY=your_groq_key
+GROQ_MODEL=llama-3.3-70b-versatile
 ```
 
 Then start the local server:

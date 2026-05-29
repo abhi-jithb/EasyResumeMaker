@@ -2,7 +2,7 @@
 
 > Paste your portfolio link. Get a professional PDF resume. Instantly.
 
-EasyResume Maker is a low-friction, AI-powered resume generator. Paste any public URL, choose a template, generate a clean resume preview, and download a PDF.
+EasyResume Maker is a low-friction, AI-powered resume generator. Paste a supported public URL, choose a template, generate a clean resume preview, and download a PDF.
 
 V2 keeps the app static and lightweight while moving AI credentials behind a small server-side API layer. Users no longer need to bring their own API key.
 
@@ -11,7 +11,7 @@ V2 keeps the app static and lightweight while moving AI credentials behind a sma
 - One URL to resume generation
 - No user API key required
 - Malformed and private URLs are rejected before scraping
-- Source detection for GitHub, LinkedIn, Portfolio, Dev.to, Hashnode, and Read.cv links
+- Source detection for GitHub, portfolio websites, Dev.to, Hashnode, public blogs, and public personal websites
 - Empty-state guidance for sparse generated resumes
 - Resume preview sections for projects and leadership/community work
 - Safer PDF filenames for generated resumes
@@ -19,8 +19,7 @@ V2 keeps the app static and lightweight while moving AI credentials behind a sma
 - Privacy-safe analytics events for generation, improvement, templates, and PDF downloads
 - ATS-friendly prompt rules for summaries, projects, bullets, and section ordering
 - Server-side AI calls using environment variables
-- OpenAI as the default AI provider
-- Groq-compatible provider abstraction for future use
+- Groq as the default AI provider
 - AI Resume Improver for polishing rough resume sentences
 - 3 PDF templates: Minimal, Modern, Classic
 - Compact PDF template for dense one-page resumes
@@ -35,8 +34,7 @@ V2 keeps the app static and lightweight while moving AI credentials behind a sma
 | Frontend | Plain HTML, CSS, JavaScript |
 | Static entry | `index.html` |
 | AI API | Vercel serverless functions |
-| Default AI provider | OpenAI Responses API |
-| Future provider | Groq |
+| Default AI provider | Groq API |
 | Web scraping | Jina Reader API |
 | PDF | jsPDF |
 | Hosting | Vercel recommended |
@@ -76,20 +74,12 @@ EasyResumeMaker/
 Set these in Vercel:
 
 ```bash
-AI_PROVIDER=openai
-OPENAI_API_KEY=your_openai_key
-OPENAI_MODEL=gpt-5-mini
-```
-
-Optional future Groq support:
-
-```bash
 AI_PROVIDER=groq
 GROQ_API_KEY=your_groq_key
 GROQ_MODEL=llama-3.3-70b-versatile
 ```
 
-`gpt-5-mini` is the default OpenAI model because it is documented for the OpenAI Responses API and is appropriate for well-defined extraction and rewrite tasks. Unsupported OpenAI model names fail the health check and AI endpoints with a server configuration error.
+Groq is the production default. If `AI_PROVIDER` is omitted, the API layer uses `groq` and requires `GROQ_API_KEY`. Unsupported provider names fail the health check and AI endpoints with a server configuration error.
 
 ### Local environment
 
@@ -102,9 +92,9 @@ vercel env pull .env.local
 Or create `.env.local` manually for local testing:
 
 ```bash
-AI_PROVIDER=openai
-OPENAI_API_KEY=your_openai_key
-OPENAI_MODEL=gpt-5-mini
+AI_PROVIDER=groq
+GROQ_API_KEY=your_groq_key
+GROQ_MODEL=llama-3.3-70b-versatile
 ```
 
 Then run:
@@ -119,9 +109,9 @@ Open `/api/health` locally before testing generation. A healthy response include
 
 Set production and preview environment variables in Vercel Project Settings:
 
-- `AI_PROVIDER=openai`
-- `OPENAI_API_KEY`
-- `OPENAI_MODEL=gpt-5-mini`
+- `AI_PROVIDER=groq`
+- `GROQ_API_KEY`
+- `GROQ_MODEL=llama-3.3-70b-versatile`
 
 After deployment, verify:
 
@@ -131,10 +121,21 @@ After deployment, verify:
 
 ### Security guidance
 
-- Never expose `OPENAI_API_KEY` or `GROQ_API_KEY` in client-side JavaScript.
+- Never expose `GROQ_API_KEY` or any provider secret in client-side JavaScript.
 - Do not commit `.env`, `.env.local`, API keys, generated resumes, raw scraped page content, or AI responses.
 - Keep AI calls behind `/api/*` serverless routes.
 - Avoid logging raw URLs, names, emails, resume text, or provider responses.
+
+## Supported Sources
+
+- GitHub profiles and repositories
+- Portfolio websites
+- Dev.to profiles and articles
+- Hashnode blogs
+- Public blogs
+- Public personal websites
+
+The source must be public, readable without login, and include visible text for projects, skills, experience, education, or community work.
 
 ## Local Development
 
@@ -227,7 +228,7 @@ Output:
 - ATS checker
 - Job description matcher
 - Multi-URL resume builder
-- Optional Groq provider exposure
+- Production hardening for API observability
 
 ## Contributing
 

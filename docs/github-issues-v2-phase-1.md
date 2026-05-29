@@ -9,19 +9,19 @@ Use these as issue titles and implementation notes.
 - Keep `index.html` as the static entry point.
 - Do not add a framework or build step.
 
-## 2. feat: add OpenAI-backed server-side AI provider
+## 2. feat: add Groq-backed server-side AI provider
 
 - Add `/api/ai/resume-generate`.
-- Read `OPENAI_API_KEY` from environment variables.
-- Use `OPENAI_MODEL`, defaulting to `gpt-5.4-mini`.
+- Read `GROQ_API_KEY` from environment variables.
+- Use `GROQ_MODEL`, defaulting to `llama-3.3-70b-versatile`.
 - Return the existing resume JSON schema.
 
-## 3. feat: add provider abstraction for OpenAI and Groq
+## 3. feat: add provider abstraction
 
 - Add `api/lib/providers.js`.
 - Select provider with `AI_PROVIDER`.
-- Default to OpenAI.
-- Keep Groq support behind the same `generateResume` and `improveResumeText` functions.
+- Default to Groq.
+- Keep provider details behind the same `generateResume` and `improveResumeText` functions.
 
 ## 4. feat: remove user API-key requirement
 

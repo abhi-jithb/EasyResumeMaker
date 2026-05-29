@@ -21,8 +21,8 @@ EasyResumeMaker V2 keeps the application static while moving AI credentials into
 ## Provider Abstraction
 
 - `api/lib/providers.js` exposes `generateResume(rawText)` and `improveResumeText(text)`.
-- OpenAI is the default provider.
-- Groq can be enabled with `AI_PROVIDER=groq`.
+- Groq is the default provider.
+- Production deployments should set `AI_PROVIDER=groq`, `GROQ_API_KEY`, and `GROQ_MODEL`.
 - Provider-specific details should stay inside `providers.js`.
 
 ## Privacy Rules

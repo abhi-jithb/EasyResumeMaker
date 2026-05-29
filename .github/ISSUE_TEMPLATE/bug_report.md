@@ -16,7 +16,7 @@ Provide the specific public URL you attempted to convert into a resume.
 Which browser and version did you experience this on? (e.g., Chrome Mobile, Safari Desktop, Firefox).
 
 ## API Provider
-Which API provider was selected when the issue occurred? (e.g., Groq API, Gemini API, Jina Reader).
+Which service was involved when the issue occurred? (e.g., Groq API or Jina Reader).
 
 ## Expected Behaviour
 A clear and concise description of what you expected to happen.
