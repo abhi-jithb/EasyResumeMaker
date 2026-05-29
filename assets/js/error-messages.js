@@ -10,7 +10,7 @@
   const API_MESSAGES = {
     rate_limited: 'Too many AI requests. Please wait a few minutes, then try again.',
     server_misconfigured: 'The AI service is not configured yet. Add the provider API key in the deployment environment.',
-    missing_input: 'There is not enough content for the AI to work with. Try a fuller portfolio, GitHub profile, or Read.cv page.',
+    missing_input: 'There is not enough content for the AI to work with. Try a fuller portfolio, GitHub profile, Dev.to profile, Hashnode blog, or public personal website.',
     invalid_ai_json: 'The AI returned a response we could not read. Please try again.',
     method_not_allowed: 'That action is not available from this page.',
     ai_failed: 'The AI service could not complete the request. Please try again in a moment.'
@@ -36,10 +36,9 @@
       '',
       'Try one of these instead:',
       '  - github.com/your-username',
-      '  - read.cv/your-username',
       '  - dev.to/your-username',
       '  - hashnode.dev/@your-username',
-      '  - a public portfolio page with visible project and experience text'
+      '  - a public portfolio, blog, or personal website with visible project and experience text'
     ].join('\n');
   }
 

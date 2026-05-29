@@ -102,7 +102,7 @@ ${RESUME_JSON_SCHEMA}
 - "projects.description": One concise recruiter-readable sentence.
 - "projects.points": Optional action-based bullets for source-supported project details.
 - "leadership_community": Community, volunteering, leadership, mentoring, speaking, organizing, and open-source community contributions.
-- "links": List of URLs such as GitHub, LinkedIn, or portfolio.
+- "links": List of URLs such as GitHub, Dev.to, Hashnode, blog, or portfolio.
 - "skills": Strictly group into categories.
 - Output sections in this order: about, experience, projects, skills, education, leadership_community.
 

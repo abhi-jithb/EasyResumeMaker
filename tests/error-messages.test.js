@@ -21,6 +21,7 @@ assert.ok(fetchErrorMessage(new Error('HTTP 403')).includes('HTTP 403'));
 const lowContent = lowContentMessage(127);
 assert.ok(lowContent.includes('127 characters'));
 assert.ok(lowContent.includes('github.com/your-username'));
-assert.ok(lowContent.includes('public portfolio page'));
+assert.ok(lowContent.includes('public portfolio, blog, or personal website'));
+assert.equal(lowContent.includes('read.cv'), false);
 
 console.log('error message tests passed');

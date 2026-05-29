@@ -29,7 +29,7 @@
   }
 
   function getResumeEmptyMessage() {
-    return 'We could not find enough resume-ready content in this source. Try a GitHub profile, Read.cv page, or portfolio with visible projects, skills, and experience.';
+    return 'We could not find enough resume-ready content in this source. Try a GitHub profile, Dev.to profile, Hashnode blog, public portfolio, or personal website with visible projects, skills, and experience.';
   }
 
   return {
