@@ -192,9 +192,17 @@ Before submitting, check:
 - [ ] If you changed PDF output, the generated PDF looks correct
 - [ ] If you changed the UI, it still matches the overall dark aesthetic
 
-### Keep the single-file structure
+### Keep the static structure
 
-Unless you have a very strong reason (and have discussed it in an issue first), all changes should stay within `index.html`. Do not introduce a build system, npm dependencies, or external script files without prior discussion.
+EasyResume Maker is still a static app. Keep markup in `index.html`, browser code in `assets/js/`, styles in `assets/css/`, and serverless AI code in `api/`. Do not introduce a framework, build system, or npm dependency without a dedicated issue.
+
+### Small PR checklist
+
+- [ ] The PR changes one thing only
+- [ ] Refactors are not bundled with feature work
+- [ ] Relevant focused Node tests were added or updated
+- [ ] The static architecture is preserved
+- [ ] No API keys, raw resume content, private URLs, or scraped page text are included
 
 ---
 

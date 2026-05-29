@@ -4,6 +4,7 @@ const fs = require('fs');
 const architecture = fs.readFileSync('docs/architecture.md', 'utf8');
 const examples = fs.readFileSync('docs/example-urls.md', 'utf8');
 const readme = fs.readFileSync('README.md', 'utf8');
+const contributing = fs.readFileSync('Contributing.md', 'utf8');
 
 assert.ok(architecture.includes('static entry point'), 'architecture doc should explain the static frontend');
 assert.ok(architecture.includes('AI API Layer'), 'architecture doc should explain API routes');
@@ -15,5 +16,7 @@ assert.ok(examples.includes('yourblog.hashnode.dev'), 'examples doc should inclu
 assert.ok(examples.toLowerCase().includes('localhost urls'), 'examples doc should warn against local URLs');
 assert.ok(readme.includes('docs/architecture.md'), 'README should link the architecture doc');
 assert.ok(readme.includes('docs/example-urls.md'), 'README should link the example URL doc');
+assert.ok(contributing.includes('Small PR checklist'), 'contributing guide should include a small PR checklist');
+assert.ok(contributing.includes('Keep the static structure'), 'contributing guide should describe the static structure');
 
 console.log('docs tests passed');
