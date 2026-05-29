@@ -11,6 +11,7 @@ V2 keeps the app static and lightweight while moving AI credentials behind a sma
 - One URL to resume generation
 - No user API key required
 - Malformed and private URLs are rejected before scraping
+- Source detection for GitHub, LinkedIn, Portfolio, Dev.to, Hashnode, and Read.cv links
 - ATS-friendly prompt rules for summaries, projects, bullets, and section ordering
 - Server-side AI calls using environment variables
 - OpenAI as the default AI provider
@@ -109,6 +110,7 @@ node tests/prompt-rules.test.js
 node tests/error-messages.test.js
 node tests/loading-state.test.js
 node tests/improver-prompt.test.js
+node tests/source-detector.test.js
 ```
 
 Resume generation quality rules are documented in `docs/ats-optimization-rules.md`.

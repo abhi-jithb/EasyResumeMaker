@@ -478,6 +478,19 @@
       color: var(--txt2)
     }
 
+    .source-hint {
+      min-height: 20px;
+      margin-top: 10px;
+      text-align: center;
+      font-family: 'DM Mono', monospace;
+      font-size: .63rem;
+      color: var(--txt3);
+    }
+
+    .source-hint.active {
+      color: var(--accent3);
+    }
+
     /* ===== ERROR ===== */
     .error-box {
       background: rgba(255, 107, 71, .07);

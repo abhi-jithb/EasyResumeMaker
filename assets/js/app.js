@@ -44,7 +44,31 @@
     // ===== HINTS =====
     function fillHint(val) {
       document.getElementById('url-input').value = val;
+      updateSourceHint();
       document.getElementById('url-input').focus();
+    }
+
+    function updateSourceHint() {
+      const input = document.getElementById('url-input');
+      const hint = document.getElementById('source-hint');
+      if (!input || !hint) return;
+
+      const value = input.value.trim();
+      if (!value) {
+        hint.textContent = '';
+        hint.classList.remove('active');
+        return;
+      }
+
+      const source = window.EasyResumeSource.detectSource(value);
+      if (source.type === 'unknown') {
+        hint.textContent = '';
+        hint.classList.remove('active');
+        return;
+      }
+
+      hint.textContent = `Detected: ${source.label}`;
+      hint.classList.add('active');
     }
 
     // ===== TABS =====
@@ -762,6 +786,7 @@
     document.getElementById('url-input').addEventListener('keydown', e => {
       if (e.key === 'Enter') generateResume();
     });
+    document.getElementById('url-input').addEventListener('input', updateSourceHint);
 
     document.addEventListener('keydown', e => {
       const isCopyShortcut = (e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'c';
