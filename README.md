@@ -130,6 +130,7 @@ node tests/docs.test.js
 
 Resume generation quality rules are documented in `docs/ats-optimization-rules.md`.
 Architecture notes are documented in `docs/architecture.md`.
+Example URL patterns are documented in `docs/example-urls.md`.
 
 ## API Endpoints
 
