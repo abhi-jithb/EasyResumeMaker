@@ -125,9 +125,11 @@ node tests/pdf-utils.test.js
 node tests/compact-template.test.js
 node tests/template-switching.test.js
 node tests/analytics.test.js
+node tests/docs.test.js
 ```
 
 Resume generation quality rules are documented in `docs/ats-optimization-rules.md`.
+Architecture notes are documented in `docs/architecture.md`.
 
 ## API Endpoints
 
