@@ -765,8 +765,7 @@
         }
       }
 
-      const fname = (d.name || 'resume').toLowerCase().replace(/\s+/g, '-');
-      doc.save(`${fname}-${tpl}-resume.pdf`);
+      doc.save(window.EasyResumePdf.buildResumeFilename(d.name, tpl));
 
       // Automatically show feedback modal after download
       setTimeout(() => {
