@@ -1,5 +1,54 @@
 const { buildImprovePrompt, buildResumePrompt } = require('./prompts');
 
+const DEFAULT_OPENAI_MODEL = 'gpt-5-mini';
+const DEFAULT_GROQ_MODEL = 'llama-3.3-70b-versatile';
+const SUPPORTED_OPENAI_MODELS = new Set([
+  'gpt-5-mini',
+  'gpt-5',
+  'gpt-5-nano',
+  'gpt-5.1',
+  'gpt-5.2',
+  'gpt-4.1-mini',
+  'gpt-4.1'
+]);
+
+function configError(message) {
+  const error = new Error(message);
+  error.code = 'server_misconfigured';
+  return error;
+}
+
+function isSupportedOpenAIModel(model) {
+  if (SUPPORTED_OPENAI_MODELS.has(model)) return true;
+
+  const snapshotMatch = model.match(/^(.+)-\d{4}-\d{2}-\d{2}$/);
+  return Boolean(snapshotMatch && SUPPORTED_OPENAI_MODELS.has(snapshotMatch[1]));
+}
+
+function validateProviderConfig(env = process.env) {
+  const provider = (env.AI_PROVIDER || 'openai').toLowerCase();
+
+  if (provider === 'openai') {
+    const model = env.OPENAI_MODEL || DEFAULT_OPENAI_MODEL;
+    if (!env.OPENAI_API_KEY) {
+      throw configError('OpenAI API key is not configured.');
+    }
+    if (!isSupportedOpenAIModel(model)) {
+      throw configError(`Unsupported OpenAI model "${model}". Use ${DEFAULT_OPENAI_MODEL} or another documented GPT model supported by the Responses API.`);
+    }
+    return { provider, model };
+  }
+
+  if (provider === 'groq') {
+    if (!env.GROQ_API_KEY) {
+      throw configError('Groq API key is not configured.');
+    }
+    return { provider, model: env.GROQ_MODEL || DEFAULT_GROQ_MODEL };
+  }
+
+  throw configError(`Unsupported AI_PROVIDER "${provider}". Use "openai" or "groq".`);
+}
+
 function stripJsonFences(text) {
   return String(text || '').replace(/```json|```/g, '').trim();
 }
@@ -17,21 +66,16 @@ function extractOpenAIText(data) {
 }
 
 async function callOpenAI({ system, user, maxOutputTokens = 2500 }) {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    const error = new Error('OpenAI API key is not configured.');
-    error.code = 'server_misconfigured';
-    throw error;
-  }
+  const { model } = validateProviderConfig(process.env);
 
   const res = await fetch('https://api.openai.com/v1/responses', {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      model: process.env.OPENAI_MODEL || 'gpt-5.4-mini',
+      model,
       input: [
         { role: 'system', content: system },
         { role: 'user', content: user }
@@ -51,15 +95,10 @@ async function callOpenAI({ system, user, maxOutputTokens = 2500 }) {
 }
 
 async function callGroq({ system, user, json = false, maxOutputTokens = 2500 }) {
-  const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) {
-    const error = new Error('Groq API key is not configured.');
-    error.code = 'server_misconfigured';
-    throw error;
-  }
+  const { model } = validateProviderConfig(process.env);
 
   const body = {
-    model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+    model,
     messages: [
       { role: 'system', content: system },
       { role: 'user', content: user }
@@ -73,7 +112,7 @@ async function callGroq({ system, user, json = false, maxOutputTokens = 2500 }) 
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(body)
@@ -90,7 +129,7 @@ async function callGroq({ system, user, json = false, maxOutputTokens = 2500 }) 
 }
 
 async function callProvider(prompt, options = {}) {
-  const provider = (process.env.AI_PROVIDER || 'openai').toLowerCase();
+  const { provider } = validateProviderConfig(process.env);
   if (provider === 'groq') return callGroq({ ...prompt, ...options });
   return callOpenAI({ ...prompt, ...options });
 }
@@ -117,6 +156,9 @@ async function improveResumeText(text) {
 }
 
 module.exports = {
+  DEFAULT_OPENAI_MODEL,
   generateResume,
-  improveResumeText
+  improveResumeText,
+  isSupportedOpenAIModel,
+  validateProviderConfig
 };
