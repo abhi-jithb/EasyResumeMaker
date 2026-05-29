@@ -65,6 +65,12 @@
       s.querySelector('.stage-status').textContent = statusText;
     }
 
+    function setGenerateButtonState(state) {
+      const btn = document.getElementById('go-btn');
+      btn.disabled = state !== 'idle';
+      btn.textContent = window.EasyResumeLoading.getGenerateButtonLabel(state);
+    }
+
     function showError(msg) {
       const el = document.getElementById('error-box');
       el.textContent = '⚠  ' + msg;
@@ -90,7 +96,7 @@
 
       const fullUrl = normalizedUrl.url;
 
-      document.getElementById('go-btn').disabled = true;
+      setGenerateButtonState('fetch');
       document.getElementById('stages').style.display = 'block';
       document.getElementById('result-section').style.display = 'none';
       ['stage-fetch', 'stage-parse', 'stage-build', 'stage-pdf'].forEach(id => setStage(id, 'waiting', 'waiting'));
@@ -109,19 +115,20 @@
       } catch (e) {
         setStage('stage-fetch', 'waiting', 'failed ✗');
         showError(window.EasyResumeErrors.fetchErrorMessage(e));
-        document.getElementById('go-btn').disabled = false;
+        setGenerateButtonState('idle');
         return;
       }
       if (rawText.length < 300) {
         setStage('stage-fetch', 'waiting', 'failed ✗');
         showError(window.EasyResumeErrors.lowContentMessage(rawText.length));
-        document.getElementById('go-btn').disabled = false;
+        setGenerateButtonState('idle');
         return;
       }
       setStage('stage-fetch', 'done', 'done ✓');
 
       // ── STAGE 2: AI PARSE ──
       setStage('stage-parse', 'active', 'extracting...');
+      setGenerateButtonState('parse');
       let parsed = null;
 
       try {
@@ -132,17 +139,19 @@
       } catch (e) {
         setStage('stage-parse', 'waiting', 'failed ✗');
         showError('AI parsing failed. ' + getFriendlyApiError(e));
-        document.getElementById('go-btn').disabled = false;
+        setGenerateButtonState('idle');
         return;
       }
 
       // ── STAGE 3: BUILD COPY ──
       setStage('stage-build', 'active', 'writing...');
+      setGenerateButtonState('build');
       await delay(900);
       setStage('stage-build', 'done', 'done ✓');
 
       // ── STAGE 4: TYPESET ──
       setStage('stage-pdf', 'active', 'typesetting...');
+      setGenerateButtonState('pdf');
       await delay(600);
       renderPreview(parsed);
       setStage('stage-pdf', 'done', 'done ✓');
@@ -150,7 +159,7 @@
       await delay(300);
       document.getElementById('result-section').style.display = 'block';
       document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      document.getElementById('go-btn').disabled = false;
+      setGenerateButtonState('idle');
     }
 
     function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
