@@ -114,6 +114,7 @@ node tests/improver-prompt.test.js
 node tests/source-detector.test.js
 node tests/resume-state.test.js
 node tests/api-validation.test.js
+node tests/mobile-css.test.js
 ```
 
 Resume generation quality rules are documented in `docs/ats-optimization-rules.md`.
