@@ -13,6 +13,7 @@ V2 keeps the app static and lightweight while moving AI credentials behind a sma
 - Malformed and private URLs are rejected before scraping
 - Source detection for GitHub, LinkedIn, Portfolio, Dev.to, Hashnode, and Read.cv links
 - Empty-state guidance for sparse generated resumes
+- Resume preview sections for projects and leadership/community work
 - ATS-friendly prompt rules for summaries, projects, bullets, and section ordering
 - Server-side AI calls using environment variables
 - OpenAI as the default AI provider
@@ -115,6 +116,7 @@ node tests/source-detector.test.js
 node tests/resume-state.test.js
 node tests/api-validation.test.js
 node tests/mobile-css.test.js
+node tests/preview-sections.test.js
 ```
 
 Resume generation quality rules are documented in `docs/ats-optimization-rules.md`.

@@ -199,6 +199,23 @@
         </ul>
       `).join('');
 
+      const projects = (d.projects || []).filter(p => p.name || p.description || p.points?.length).map(p => `
+        <div class="rf-item-title">${esc(p.name || 'Project')}</div>
+        ${p.tech ? `<div class="rf-item-sub">${esc(p.tech)}</div>` : ''}
+        ${p.description ? `<div class="rf-item-desc">${esc(p.description)}</div>` : ''}
+        ${p.points?.length ? `<ul class="rf-item-desc" style="padding-left: 1.2rem; margin-top: 4px;">
+          ${p.points.map(point => `<li>${esc(point)}</li>`).join('')}
+        </ul>` : ''}
+      `).join('');
+
+      const leadership = (d.leadership_community || []).filter(item => item.role || item.organization || item.points?.length).map(item => `
+        <div class="rf-item-title">${esc(item.role || 'Leadership')}</div>
+        ${item.organization || item.duration ? `<div class="rf-item-sub">${esc(item.organization)}${item.organization && item.duration ? ' — ' : ''}${esc(item.duration)}</div>` : ''}
+        ${item.points?.length ? `<ul class="rf-item-desc" style="padding-left: 1.2rem; margin-top: 4px;">
+          ${item.points.map(point => `<li>${esc(point)}</li>`).join('')}
+        </ul>` : ''}
+      `).join('');
+
       // Skills markup
       const sk = d.skills || {};
       const skillsMarkup = `
@@ -222,6 +239,7 @@
           ${emptyMarkup}
           ${d.about ? `<div class="rf-section">About Me</div><div class="rf-item-desc">${esc(d.about)}</div>` : ''}
           ${exp ? `<div class="rf-section">Experience</div>${exp}` : ''}
+          ${projects ? `<div class="rf-section">Projects</div>${projects}` : ''}
           ${d.achievements?.length ? `
             <div class="rf-section">Achievements</div>
             <ul class="rf-item-desc" style="padding-left: 1.2rem;">
@@ -240,6 +258,7 @@
               <div class="rf-item-sub">${esc(ed.institution)} ${ed.duration ? ' — ' + esc(ed.duration) : ''}</div>
             `).join('')}
           ` : ''}
+          ${leadership ? `<div class="rf-section">Leadership / Community</div>${leadership}` : ''}
         </div>`;
 
       // JSON preview
