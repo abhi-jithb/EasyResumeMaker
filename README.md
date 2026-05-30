@@ -109,14 +109,21 @@ easyresume-maker/
 
 | Source | Works? | Notes |
 |---|---|---|
-| Personal portfolio sites | ✅ Best | Most info, cleanest extraction |
+| Personal portfolio sites (static/SSG) | ✅ Best | Most info, cleanest extraction |
 | GitHub profiles | ✅ Great | Pulls bio, repos, skills |
-| Dev.to profiles | ✅ Great | Articles parsed as experience |
+| Dev.to profiles | ⚠️ Partial | Jina Reader returns HTTP 400 for some Dev.to URLs |
 | Hashnode blogs | ✅ Great | — |
 | Read.cv | ✅ Great | Purpose-built for this use case |
-| LinkedIn | ⚠️ Partial | Public profiles only, limited content |
+| LinkedIn | ⚠️ Limited | Returns ~127 chars (JS-blocked) — triggers low-content warning |
 | Behance | ✅ Good | Project descriptions extracted |
-| Medium | ✅ Good | Bio + article topics |
+| Medium | ⚠️ Limited | @username pages return ~246 chars — triggers low-content warning |
+| React portfolio sites | ✅ Usually works | Jina extracts static HTML shell; results vary by site |
+| Next.js portfolio sites | ⚠️ Partial | Some content extracted but resume may be sparse (e.g. leerob.io) |
+| Vue / Nuxt portfolio sites | ⚠️ Limited | JS-rendered — little content extracted; prefer GitHub or Dev.to |
+| Angular portfolio sites | ⚠️ Limited | JS-rendered — prefer a static alternative |
+| Astro / SvelteKit sites | ✅ Usually works | Mostly pre-rendered HTML; extraction typically succeeds |
+
+> **Why do some sites fail?** Sites that load content via JavaScript (React, Next.js, Vue, Angular) may return fewer than 300 characters to Jina Reader — not enough to build a resume. The app will show a specific warning with suggested alternatives instead of passing empty input to the AI. LinkedIn actively blocks scrapers and consistently returns < 300 chars.
 
 ---
 
