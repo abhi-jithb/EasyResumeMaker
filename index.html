@@ -689,6 +689,48 @@
       transition: width .4s ease
     }
 
+    .stage-extras {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .stage-warning {
+      font-size: .75rem;
+      color: #eab308;
+      display: none;
+    }
+
+    .btn-cancel {
+      background: transparent;
+      color: var(--txt2);
+      font-family: 'Syne', sans-serif;
+      font-size: .75rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: color .2s, border-color .2s;
+      display: none;
+    }
+
+    .btn-cancel:hover {
+      color: var(--txt);
+      border-color: var(--txt2);
+    }
+
+    .stage-counter {
+      color: var(--txt3);
+      font-family: 'DM Mono', monospace;
+      font-size: .65rem;
+      margin-left: 6px;
+      font-weight: 400;
+      letter-spacing: .02em;
+    }
+
     /* ===== RESULT ===== */
     .result-section {
       display: none;
@@ -1511,7 +1553,7 @@
       <div class="stage waiting" id="stage-fetch">
         <div class="stage-header">
           <div class="stage-icon">🌐</div>
-          <div class="stage-name">Fetching your page</div>
+          <div class="stage-name">Fetching your page <span class="stage-counter">· Stage 1 of 4</span></div>
           <div class="stage-status" aria-live="polite">waiting</div>
         </div>
         <div class="stage-desc">Reading every word, project, and skill from your public URL using Jina Reader API —
@@ -1519,12 +1561,16 @@
         <div class="load-bar" aria-hidden="true">
           <div class="load-fill"></div>
         </div>
+        <div class="stage-extras">
+          <div class="stage-warning">This is taking longer than usual. The page may have a lot of content.</div>
+          <button class="btn-cancel" onclick="cancelGeneration()">Cancel</button>
+        </div>
       </div>
 
       <div class="stage waiting" id="stage-parse">
         <div class="stage-header">
           <div class="stage-icon">🧠</div>
-          <div class="stage-name">Extracting your story</div>
+          <div class="stage-name">Extracting your story <span class="stage-counter">· Stage 2 of 4</span></div>
           <div class="stage-status" aria-live="polite">waiting</div>
         </div>
         <div class="stage-desc">AI reads the raw content and identifies your name, roles, skills, education, projects,
@@ -1532,12 +1578,16 @@
         <div class="load-bar" aria-hidden="true">
           <div class="load-fill"></div>
         </div>
+        <div class="stage-extras">
+          <div class="stage-warning">This is taking longer than usual. The page may have a lot of content.</div>
+          <button class="btn-cancel" onclick="cancelGeneration()">Cancel</button>
+        </div>
       </div>
 
       <div class="stage waiting" id="stage-build">
         <div class="stage-header">
           <div class="stage-icon">✍️</div>
-          <div class="stage-name">Writing your resume</div>
+          <div class="stage-name">Writing your resume <span class="stage-counter">· Stage 3 of 4</span></div>
           <div class="stage-status" aria-live="polite">waiting</div>
         </div>
         <div class="stage-desc">Crafting polished, professional resume copy from your extracted data — proper verbs,
@@ -1545,18 +1595,26 @@
         <div class="load-bar" aria-hidden="true">
           <div class="load-fill"></div>
         </div>
+        <div class="stage-extras">
+          <div class="stage-warning">This is taking longer than usual. The page may have a lot of content.</div>
+          <button class="btn-cancel" onclick="cancelGeneration()">Cancel</button>
+        </div>
       </div>
 
       <div class="stage waiting" id="stage-pdf">
         <div class="stage-header">
           <div class="stage-icon">📄</div>
-          <div class="stage-name">Typesetting PDF</div>
+          <div class="stage-name">Typesetting PDF <span class="stage-counter">· Stage 4 of 4</span></div>
           <div class="stage-status" aria-live="polite">waiting</div>
         </div>
         <div class="stage-desc">Laying out your resume in your chosen template with beautiful typography, perfect
           margins, and ATS-friendly formatting.</div>
         <div class="load-bar" aria-hidden="true">
           <div class="load-fill"></div>
+        </div>
+        <div class="stage-extras">
+          <div class="stage-warning">This is taking longer than usual. The page may have a lot of content.</div>
+          <button class="btn-cancel" onclick="cancelGeneration()">Cancel</button>
         </div>
       </div>
 
@@ -1710,6 +1768,11 @@
     // ===== STATE =====
     let resumeData = null;
     let selectedTemplate = 'minimal';
+    let stageInterval = null;
+    let activeStageId = null;
+    let stageStartTime = 0;
+    let activeStageBaseText = '';
+    let currentAbortController = null;
 
     // ===== TEMPLATE SELECTION =====
     function selectTemplate(el) {
@@ -1742,8 +1805,67 @@
     // ===== STAGE HELPERS =====
     function setStage(id, state, statusText) {
       const s = document.getElementById(id);
+      if (!s) return;
       s.className = 'stage ' + state;
       s.querySelector('.stage-status').textContent = statusText;
+
+      if (state === 'active') {
+        activeStageId = id;
+        activeStageBaseText = statusText;
+        stageStartTime = Date.now();
+        
+        if (stageInterval) clearInterval(stageInterval);
+        stageInterval = setInterval(updateStageTimer, 1000);
+      } else if (state === 'done' || state === 'waiting') {
+        if (activeStageId === id) {
+          if (stageInterval) {
+            clearInterval(stageInterval);
+            stageInterval = null;
+          }
+          activeStageId = null;
+        }
+        const extras = s.querySelector('.stage-extras');
+        if (extras) {
+          extras.querySelector('.stage-warning').style.display = 'none';
+          extras.querySelector('.btn-cancel').style.display = 'none';
+        }
+      }
+    }
+
+    function updateStageTimer() {
+      if (!activeStageId) return;
+      const s = document.getElementById(activeStageId);
+      if (!s) return;
+      
+      const elapsed = Math.floor((Date.now() - stageStartTime) / 1000);
+      s.querySelector('.stage-status').textContent = `${activeStageBaseText} ${elapsed}s`;
+      
+      const extras = s.querySelector('.stage-extras');
+      if (extras) {
+        if (elapsed >= 15) {
+          extras.querySelector('.stage-warning').style.display = 'block';
+        }
+        if (elapsed >= 10) {
+          extras.querySelector('.btn-cancel').style.display = 'inline-block';
+        }
+      }
+    }
+
+    function cancelGeneration() {
+      if (currentAbortController) {
+        currentAbortController.abort();
+      }
+      if (stageInterval) clearInterval(stageInterval);
+      stageInterval = null;
+      activeStageId = null;
+      currentAbortController = null;
+      
+      document.getElementById('go-btn').disabled = false;
+      document.getElementById('stages').style.display = 'none';
+      ['stage-fetch', 'stage-parse', 'stage-build', 'stage-pdf'].forEach(id => {
+        setStage(id, 'waiting', 'waiting');
+      });
+      showError('Generation cancelled by user.');
     }
 
     function showError(msg) {
@@ -1769,6 +1891,9 @@
 
       const fullUrl = url.startsWith('http') ? url : 'https://' + url;
 
+      currentAbortController = new AbortController();
+      const signal = currentAbortController.signal;
+
       document.getElementById('go-btn').disabled = true;
       document.getElementById('stages').style.display = 'block';
       document.getElementById('result-section').style.display = 'none';
@@ -1780,12 +1905,14 @@
       try {
         const jinaUrl = 'https://r.jina.ai/' + fullUrl;
         const res = await fetch(jinaUrl, {
-          headers: { 'Accept': 'text/plain', 'X-Return-Format': 'text', 'X-Timeout': '20' }
+          headers: { 'Accept': 'text/plain', 'X-Return-Format': 'text', 'X-Timeout': '20' },
+          signal
         });
         if (!res.ok) throw new Error('HTTP ' + res.status);
         rawText = await res.text();
         rawText = rawText.slice(0, 30000); // Increased limit for better details
       } catch (e) {
+        if (e.name === 'AbortError') return;
         setStage('stage-fetch', 'waiting', 'failed ✗');
         showError('Could not read that URL. Make sure the page is public and accessible. Error: ' + e.message);
         document.getElementById('go-btn').disabled = false;
@@ -1810,6 +1937,7 @@
       setStage('stage-fetch', 'done', 'done ✓');
 
       // ── STAGE 2: AI PARSE ──
+      if (signal.aborted) return;
       setStage('stage-parse', 'active', 'extracting...');
       let parsed = null;
 
@@ -1885,7 +2013,8 @@ ${rawText}`;
               temperature: 0.25,
               max_tokens: 2500,
               response_format: { type: 'json_object' }
-            })
+            }),
+            signal
           });
           const d = await res.json();
           if (!res.ok) throw new Error(d.error?.message || 'Groq API error ' + res.status);
@@ -1904,7 +2033,8 @@ ${rawText}`;
                 temperature: 0.25,
                 maxOutputTokens: 2500
               }
-            })
+            }),
+            signal
           });
           const d = await res.json();
           if (!res.ok) throw new Error(d.error?.message || 'Gemini API error ' + res.status);
@@ -1918,6 +2048,7 @@ ${rawText}`;
         setStage('stage-parse', 'done', 'done ✓');
 
       } catch (e) {
+        if (e.name === 'AbortError') return;
         setStage('stage-parse', 'waiting', 'failed ✗');
         showError('AI parsing failed. Check your API key and try again. Error: ' + e.message);
         document.getElementById('go-btn').disabled = false;
@@ -1925,23 +2056,38 @@ ${rawText}`;
       }
 
       // ── STAGE 3: BUILD COPY ──
+      if (signal.aborted) return;
       setStage('stage-build', 'active', 'writing...');
-      await delay(900);
+      await delay(900, signal);
+      if (signal.aborted) return;
       setStage('stage-build', 'done', 'done ✓');
 
       // ── STAGE 4: TYPESET ──
+      if (signal.aborted) return;
       setStage('stage-pdf', 'active', 'typesetting...');
-      await delay(600);
+      await delay(600, signal);
+      if (signal.aborted) return;
       renderPreview(parsed);
       setStage('stage-pdf', 'done', 'done ✓');
 
-      await delay(300);
+      await delay(300, signal);
+      if (signal.aborted) return;
       document.getElementById('result-section').style.display = 'block';
       document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
       document.getElementById('go-btn').disabled = false;
     }
 
-    function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+    function delay(ms, signal) { 
+      return new Promise(r => {
+        const timer = setTimeout(r, ms);
+        if (signal) {
+          signal.addEventListener('abort', () => {
+            clearTimeout(timer);
+            r();
+          }, { once: true });
+        }
+      }); 
+    }
 
     // ===== RENDER PREVIEW =====
     function renderPreview(d) {
