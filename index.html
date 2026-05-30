@@ -659,6 +659,48 @@
       transition: width .4s ease
     }
 
+    .stage-extras {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .stage-warning {
+      font-size: .75rem;
+      color: #eab308;
+      display: none;
+    }
+
+    .btn-cancel {
+      background: transparent;
+      color: var(--txt2);
+      font-family: 'Syne', sans-serif;
+      font-size: .75rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: color .2s, border-color .2s;
+      display: none;
+    }
+
+    .btn-cancel:hover {
+      color: var(--txt);
+      border-color: var(--txt2);
+    }
+
+    .stage-counter {
+      color: var(--txt3);
+      font-family: 'DM Mono', monospace;
+      font-size: .65rem;
+      margin-left: 6px;
+      font-weight: 400;
+      letter-spacing: .02em;
+    }
+
     /* ===== RESULT ===== */
     .result-section {
       display: none;
@@ -866,6 +908,56 @@
       line-height: 1.5;
     }
 
+    .toast-region {
+      position: fixed;
+      right: 24px;
+      bottom: 88px;
+      z-index: 250;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: min(360px, calc(100vw - 48px));
+    }
+
+    .toast {
+      background: rgba(24, 24, 31, .94);
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-left: 3px solid var(--success);
+      border-radius: 14px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, .36);
+      color: var(--txt);
+      font-size: .78rem;
+      line-height: 1.5;
+      padding: 13px 16px;
+      transform: translateY(10px);
+      opacity: 0;
+      animation: toast-in .24s ease forwards;
+      backdrop-filter: blur(14px);
+    }
+
+    .toast.error {
+      border-left-color: var(--error);
+    }
+
+    .toast.leaving {
+      animation: toast-out .22s ease forwards;
+    }
+
+    @keyframes toast-in {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes toast-out {
+      to {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+    }
+
     @media print {
       .resume-preview {
         max-height: none;
@@ -947,6 +1039,44 @@
 
     .btn-dl:hover {
       transform: scale(1.03)
+    }
+
+    .btn-copy {
+      background: rgba(255, 255, 255, .04);
+      color: var(--txt);
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .85rem;
+      border: 1px solid var(--border);
+      padding: 14px 24px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform .15s, border-color .2s, background .2s, color .2s;
+      min-height: 48px;
+    }
+
+    .btn-copy:hover {
+      transform: scale(1.03);
+      border-color: rgba(232, 255, 71, .45);
+      background: rgba(232, 255, 71, .08);
+    }
+
+    .btn-copy:focus-visible,
+    .btn-dl:focus-visible,
+    .btn-new:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .btn-copy.is-copying {
+      color: var(--txt2);
+      pointer-events: none;
+    }
+
+    .btn-copy.is-copied {
+      border-color: rgba(71, 255, 178, .5);
+      color: var(--success);
+      background: rgba(71, 255, 178, .08);
     }
 
     .btn-new {
@@ -1215,8 +1345,16 @@
       }
 
       .btn-dl,
+      .btn-copy,
       .btn-new {
         width: 100%
+      }
+
+      .toast-region {
+        right: 16px;
+        left: 16px;
+        bottom: 82px;
+        max-width: none;
       }
     }
   </style>
@@ -1364,7 +1502,7 @@
       <div class="stage waiting" id="stage-fetch">
         <div class="stage-header">
           <div class="stage-icon">🌐</div>
-          <div class="stage-name">Fetching your page</div>
+          <div class="stage-name">Fetching your page <span class="stage-counter">· Stage 1 of 4</span></div>
           <div class="stage-status" aria-live="polite">waiting</div>
         </div>
         <div class="stage-desc">Reading every word, project, and skill from your public URL using Jina Reader API —
@@ -1372,12 +1510,16 @@
         <div class="load-bar" aria-hidden="true">
           <div class="load-fill"></div>
         </div>
+        <div class="stage-extras">
+          <div class="stage-warning">This is taking longer than usual. The page may have a lot of content.</div>
+          <button class="btn-cancel" onclick="cancelGeneration()">Cancel</button>
+        </div>
       </div>
 
       <div class="stage waiting" id="stage-parse">
         <div class="stage-header">
           <div class="stage-icon">🧠</div>
-          <div class="stage-name">Extracting your story</div>
+          <div class="stage-name">Extracting your story <span class="stage-counter">· Stage 2 of 4</span></div>
           <div class="stage-status" aria-live="polite">waiting</div>
         </div>
         <div class="stage-desc">AI reads the raw content and identifies your name, roles, skills, education, projects,
@@ -1385,12 +1527,16 @@
         <div class="load-bar" aria-hidden="true">
           <div class="load-fill"></div>
         </div>
+        <div class="stage-extras">
+          <div class="stage-warning">This is taking longer than usual. The page may have a lot of content.</div>
+          <button class="btn-cancel" onclick="cancelGeneration()">Cancel</button>
+        </div>
       </div>
 
       <div class="stage waiting" id="stage-build">
         <div class="stage-header">
           <div class="stage-icon">✍️</div>
-          <div class="stage-name">Writing your resume</div>
+          <div class="stage-name">Writing your resume <span class="stage-counter">· Stage 3 of 4</span></div>
           <div class="stage-status" aria-live="polite">waiting</div>
         </div>
         <div class="stage-desc">Crafting polished, professional resume copy from your extracted data — proper verbs,
@@ -1398,18 +1544,26 @@
         <div class="load-bar" aria-hidden="true">
           <div class="load-fill"></div>
         </div>
+        <div class="stage-extras">
+          <div class="stage-warning">This is taking longer than usual. The page may have a lot of content.</div>
+          <button class="btn-cancel" onclick="cancelGeneration()">Cancel</button>
+        </div>
       </div>
 
       <div class="stage waiting" id="stage-pdf">
         <div class="stage-header">
           <div class="stage-icon">📄</div>
-          <div class="stage-name">Typesetting PDF</div>
+          <div class="stage-name">Typesetting PDF <span class="stage-counter">· Stage 4 of 4</span></div>
           <div class="stage-status" aria-live="polite">waiting</div>
         </div>
         <div class="stage-desc">Laying out your resume in your chosen template with beautiful typography, perfect
           margins, and ATS-friendly formatting.</div>
         <div class="load-bar" aria-hidden="true">
           <div class="load-fill"></div>
+        </div>
+        <div class="stage-extras">
+          <div class="stage-warning">This is taking longer than usual. The page may have a lot of content.</div>
+          <button class="btn-cancel" onclick="cancelGeneration()">Cancel</button>
         </div>
       </div>
 
@@ -1439,10 +1593,13 @@
 
         <div class="btn-row">
           <button class="btn-dl" onclick="downloadPDF()">⬇ Download PDF</button>
+          <button class="btn-copy" id="copy-resume-btn" onclick="copyResume()" aria-label="Copy generated resume content to clipboard">Copy Resume</button>
           <button class="btn-new" onclick="startOver()">Try another URL</button>
         </div>
       </div>
     </div>
+
+    <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
 
     <!-- FAQ (SEO content) -->
     <section class="faq" aria-labelledby="faq-heading">
@@ -1536,6 +1693,11 @@
     // ===== STATE =====
     let resumeData = null;
     let selectedTemplate = 'minimal';
+    let stageInterval = null;
+    let activeStageId = null;
+    let stageStartTime = 0;
+    let activeStageBaseText = '';
+    let currentAbortController = null;
 
     // ===== TEMPLATE SELECTION =====
     function selectTemplate(el) {
@@ -1568,8 +1730,67 @@
     // ===== STAGE HELPERS =====
     function setStage(id, state, statusText) {
       const s = document.getElementById(id);
+      if (!s) return;
       s.className = 'stage ' + state;
       s.querySelector('.stage-status').textContent = statusText;
+
+      if (state === 'active') {
+        activeStageId = id;
+        activeStageBaseText = statusText;
+        stageStartTime = Date.now();
+        
+        if (stageInterval) clearInterval(stageInterval);
+        stageInterval = setInterval(updateStageTimer, 1000);
+      } else if (state === 'done' || state === 'waiting') {
+        if (activeStageId === id) {
+          if (stageInterval) {
+            clearInterval(stageInterval);
+            stageInterval = null;
+          }
+          activeStageId = null;
+        }
+        const extras = s.querySelector('.stage-extras');
+        if (extras) {
+          extras.querySelector('.stage-warning').style.display = 'none';
+          extras.querySelector('.btn-cancel').style.display = 'none';
+        }
+      }
+    }
+
+    function updateStageTimer() {
+      if (!activeStageId) return;
+      const s = document.getElementById(activeStageId);
+      if (!s) return;
+      
+      const elapsed = Math.floor((Date.now() - stageStartTime) / 1000);
+      s.querySelector('.stage-status').textContent = `${activeStageBaseText} ${elapsed}s`;
+      
+      const extras = s.querySelector('.stage-extras');
+      if (extras) {
+        if (elapsed >= 15) {
+          extras.querySelector('.stage-warning').style.display = 'block';
+        }
+        if (elapsed >= 10) {
+          extras.querySelector('.btn-cancel').style.display = 'inline-block';
+        }
+      }
+    }
+
+    function cancelGeneration() {
+      if (currentAbortController) {
+        currentAbortController.abort();
+      }
+      if (stageInterval) clearInterval(stageInterval);
+      stageInterval = null;
+      activeStageId = null;
+      currentAbortController = null;
+      
+      document.getElementById('go-btn').disabled = false;
+      document.getElementById('stages').style.display = 'none';
+      ['stage-fetch', 'stage-parse', 'stage-build', 'stage-pdf'].forEach(id => {
+        setStage(id, 'waiting', 'waiting');
+      });
+      showError('Generation cancelled by user.');
     }
 
     function showError(msg) {
@@ -1595,6 +1816,9 @@
 
       const fullUrl = url.startsWith('http') ? url : 'https://' + url;
 
+      currentAbortController = new AbortController();
+      const signal = currentAbortController.signal;
+
       document.getElementById('go-btn').disabled = true;
       document.getElementById('stages').style.display = 'block';
       document.getElementById('result-section').style.display = 'none';
@@ -1606,7 +1830,8 @@
       try {
         const jinaUrl = 'https://r.jina.ai/' + fullUrl;
         const res = await fetch(jinaUrl, {
-          headers: { 'Accept': 'text/plain', 'X-Return-Format': 'text', 'X-Timeout': '20' }
+          headers: { 'Accept': 'text/plain', 'X-Return-Format': 'text', 'X-Timeout': '20' },
+          signal
         });
         if (!res.ok) throw new Error('HTTP ' + res.status);
         rawText = await res.text();
@@ -1614,6 +1839,7 @@
         if (rawText.length < 100) throw new Error('Page returned very little content. It may require a login.');
         setStage('stage-fetch', 'done', 'done ✓');
       } catch (e) {
+        if (e.name === 'AbortError') return;
         setStage('stage-fetch', 'waiting', 'failed ✗');
         showError('Could not read that URL. Make sure the page is public and accessible. Error: ' + e.message);
         document.getElementById('go-btn').disabled = false;
@@ -1621,6 +1847,7 @@
       }
 
       // ── STAGE 2: AI PARSE ──
+      if (signal.aborted) return;
       setStage('stage-parse', 'active', 'extracting...');
       let parsed = null;
 
@@ -1696,7 +1923,8 @@ ${rawText}`;
               temperature: 0.25,
               max_tokens: 2500,
               response_format: { type: 'json_object' }
-            })
+            }),
+            signal
           });
           const d = await res.json();
           if (!res.ok) throw new Error(d.error?.message || 'Groq API error ' + res.status);
@@ -1715,7 +1943,8 @@ ${rawText}`;
                 temperature: 0.25,
                 maxOutputTokens: 2500
               }
-            })
+            }),
+            signal
           });
           const d = await res.json();
           if (!res.ok) throw new Error(d.error?.message || 'Gemini API error ' + res.status);
@@ -1729,6 +1958,7 @@ ${rawText}`;
         setStage('stage-parse', 'done', 'done ✓');
 
       } catch (e) {
+        if (e.name === 'AbortError') return;
         setStage('stage-parse', 'waiting', 'failed ✗');
         showError('AI parsing failed. Check your API key and try again. Error: ' + e.message);
         document.getElementById('go-btn').disabled = false;
@@ -1736,23 +1966,38 @@ ${rawText}`;
       }
 
       // ── STAGE 3: BUILD COPY ──
+      if (signal.aborted) return;
       setStage('stage-build', 'active', 'writing...');
-      await delay(900);
+      await delay(900, signal);
+      if (signal.aborted) return;
       setStage('stage-build', 'done', 'done ✓');
 
       // ── STAGE 4: TYPESET ──
+      if (signal.aborted) return;
       setStage('stage-pdf', 'active', 'typesetting...');
-      await delay(600);
+      await delay(600, signal);
+      if (signal.aborted) return;
       renderPreview(parsed);
       setStage('stage-pdf', 'done', 'done ✓');
 
-      await delay(300);
+      await delay(300, signal);
+      if (signal.aborted) return;
       document.getElementById('result-section').style.display = 'block';
       document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
       document.getElementById('go-btn').disabled = false;
     }
 
-    function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+    function delay(ms, signal) { 
+      return new Promise(r => {
+        const timer = setTimeout(r, ms);
+        if (signal) {
+          signal.addEventListener('abort', () => {
+            clearTimeout(timer);
+            r();
+          }, { once: true });
+        }
+      }); 
+    }
 
     // ===== RENDER PREVIEW =====
     function renderPreview(d) {
@@ -1806,6 +2051,168 @@ ${rawText}`;
 
       // JSON preview
       document.getElementById('resume-json-view').textContent = JSON.stringify(d, null, 2);
+    }
+
+    // ===== COPY RESUME =====
+    function buildResumePlainText(d) {
+      const lines = [];
+      const add = value => {
+        if (value) lines.push(String(value).trim());
+      };
+      const addBlank = () => {
+        if (lines.length && lines[lines.length - 1] !== '') lines.push('');
+      };
+      const addSection = (title, writer) => {
+        const start = lines.length;
+        addBlank();
+        lines.push(title.toUpperCase());
+        writer();
+        if (lines.length === start + 1) lines.splice(start, 1);
+      };
+
+      const c = d.contact || {};
+      const contact = [c.phone || d.phone, c.email || d.email, c.location || d.location, ...(c.links || [])].filter(Boolean);
+      const links = d.links && !Array.isArray(d.links)
+        ? Object.entries(d.links).filter(([, value]) => value).map(([label, value]) => `${label}: ${value}`)
+        : [];
+
+      add(d.name || 'Your Name');
+      add(d.title);
+      if (contact.length) add(contact.join(' | '));
+      if (links.length) add(links.join(' | '));
+
+      if (d.about || d.summary) {
+        addSection('Profile', () => add(d.about || d.summary));
+      }
+
+      const experience = (d.experience || []).filter(e => e.role || e.organization || e.company || e.description || e.points?.length);
+      if (experience.length) {
+        addSection('Experience', () => {
+          experience.forEach(e => {
+            addBlank();
+            add([e.role, e.organization || e.company].filter(Boolean).join(' - '));
+            add([e.duration, e.location].filter(Boolean).join(' | '));
+            (e.points || []).forEach(point => add(`- ${point}`));
+            if (e.description) add(`- ${e.description}`);
+          });
+        });
+      }
+
+      const projects = (d.projects || []).filter(p => p.name || p.description);
+      if (projects.length) {
+        addSection('Projects', () => {
+          projects.forEach(p => {
+            addBlank();
+            add(p.name);
+            add(p.tech);
+            if (p.description) add(`- ${p.description}`);
+          });
+        });
+      }
+
+      if (d.achievements?.length) {
+        addSection('Achievements', () => d.achievements.forEach(item => add(`- ${item}`)));
+      }
+
+      const sk = d.skills || {};
+      const skillLines = Array.isArray(sk)
+        ? sk
+        : [
+          sk.languages?.length ? `Languages: ${sk.languages.join(', ')}` : '',
+          sk.tools?.length ? `Tools: ${sk.tools.join(', ')}` : '',
+          sk.soft_skills?.length ? `Soft Skills: ${sk.soft_skills.join(', ')}` : ''
+        ].filter(Boolean);
+      if (skillLines.length) {
+        addSection('Skills', () => skillLines.forEach(add));
+      }
+
+      if (d.languages_spoken?.length) {
+        addSection('Languages', () => add(d.languages_spoken.join(', ')));
+      }
+
+      const education = (d.education || []).filter(ed => ed.degree || ed.institution);
+      if (education.length) {
+        addSection('Education', () => {
+          education.forEach(ed => {
+            addBlank();
+            add([ed.degree, ed.institution].filter(Boolean).join(' - '));
+            add(ed.duration || ed.year);
+          });
+        });
+      }
+
+      return lines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+    }
+
+    async function copyTextToClipboard(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return;
+      }
+
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.top = '-999px';
+      textarea.style.left = '-999px';
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      const copied = document.execCommand('copy');
+      textarea.remove();
+      if (!copied) throw new Error('Clipboard fallback failed');
+    }
+
+    function showToast(message, type = 'success') {
+      const region = document.getElementById('toast-region');
+      if (!region) return;
+
+      const toast = document.createElement('div');
+      toast.className = `toast ${type === 'error' ? 'error' : ''}`;
+      toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
+      toast.textContent = message;
+      region.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('leaving');
+        toast.addEventListener('animationend', () => toast.remove(), { once: true });
+      }, 2600);
+    }
+
+    function setCopyButtonState(state) {
+      const btn = document.getElementById('copy-resume-btn');
+      if (!btn) return;
+
+      btn.classList.toggle('is-copying', state === 'copying');
+      btn.classList.toggle('is-copied', state === 'copied');
+      btn.disabled = state === 'copying';
+      btn.textContent = state === 'copying' ? 'Copying...' : state === 'copied' ? 'Copied' : 'Copy Resume';
+    }
+
+    async function copyResume() {
+      if (!resumeData) {
+        showToast('Generate a resume before copying.', 'error');
+        return;
+      }
+
+      const resumeText = buildResumePlainText(resumeData);
+      if (!resumeText) {
+        showToast('No resume content found to copy.', 'error');
+        return;
+      }
+
+      setCopyButtonState('copying');
+      try {
+        await copyTextToClipboard(resumeText);
+        setCopyButtonState('copied');
+        showToast('Resume copied successfully!');
+      } catch (error) {
+        setCopyButtonState('idle');
+        showToast('Failed to copy resume. Please try again.', 'error');
+      } finally {
+        setTimeout(() => setCopyButtonState('idle'), 2200);
+      }
     }
 
     // ===== PDF DOWNLOAD =====
@@ -2170,6 +2577,7 @@ ${rawText}`;
       document.getElementById('result-section').style.display = 'none';
       document.getElementById('stages').style.display = 'none';
       hideError();
+      setCopyButtonState('idle');
       resumeData = null;
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -2188,6 +2596,13 @@ ${rawText}`;
 
     document.getElementById('url-input').addEventListener('keydown', e => {
       if (e.key === 'Enter') generateResume();
+    });
+
+    document.addEventListener('keydown', e => {
+      const isCopyShortcut = (e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'c';
+      if (!isCopyShortcut || !resumeData) return;
+      e.preventDefault();
+      copyResume();
     });
 
     // Gemini Coming Soon Handler
