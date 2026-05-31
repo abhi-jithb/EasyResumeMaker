@@ -25,6 +25,7 @@ function makeElement(tagName) {
     addEventListener(event, handler) {
       this[`on${event}`] = handler;
     },
+    removeEventListener() {},
     getContext(type) {
       assert.equal(type, '2d');
       return {
@@ -42,10 +43,17 @@ function makeElement(tagName) {
 }
 
 const documentStub = {
+  listeners: {},
   createElement(tagName) {
     const el = makeElement(tagName);
     created.push(el);
     return el;
+  },
+  addEventListener(event, handler) {
+    this.listeners[event] = handler;
+  },
+  removeEventListener(event) {
+    delete this.listeners[event];
   }
 };
 
@@ -64,6 +72,18 @@ assert.equal(runner.canvas.height, 220);
 assert.equal(runner.status.textContent, 'Ready');
 assert.equal(runner.player.width, 34);
 assert.equal(runner.player.height, 46);
+assert.equal(runner.player.y, runner.groundY - runner.player.height);
+assert.equal(typeof runner.canvas.onpointerdown, 'function');
+assert.equal(typeof documentStub.listeners.keydown, 'function');
+
+assert.equal(runner.jump(), true);
+assert.equal(runner.player.isJumping, true);
+assert.equal(runner.jump(), false);
+runner.updatePlayer();
+assert.ok(runner.player.y < runner.groundY - runner.player.height);
+
+for (let i = 0; i < 60; i += 1) runner.updatePlayer();
+assert.equal(runner.player.isJumping, false);
 assert.equal(runner.player.y, runner.groundY - runner.player.height);
 
 runner.start();

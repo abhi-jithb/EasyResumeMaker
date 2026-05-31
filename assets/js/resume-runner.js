@@ -30,8 +30,13 @@
         vy: 0,
         isJumping: false
       };
+      this.physics = {
+        gravity: 0.72,
+        jumpVelocity: -12.5
+      };
       this.mount();
       this.drawIdle();
+      this.bindControls();
     }
 
     mount() {
@@ -86,6 +91,20 @@
       this.target.append(this.el);
     }
 
+    bindControls() {
+      this.onKeyDown = (event) => {
+        if (event.code !== 'Space' && event.key !== ' ') return;
+        event.preventDefault();
+        this.jump();
+      };
+      this.onPointerDown = () => this.jump();
+
+      const doc = this.target.ownerDocument || root.document;
+      if (doc && doc.addEventListener) doc.addEventListener('keydown', this.onKeyDown);
+      this.canvas.addEventListener('pointerdown', this.onPointerDown);
+      this.canvas.addEventListener('touchstart', this.onPointerDown);
+    }
+
     drawIdle() {
       if (!this.ctx) return;
       const { width, height } = this.canvas;
@@ -131,6 +150,27 @@
       this.ctx.fillRect(p.x + 21, p.y + p.height - 3, 9, 3);
     }
 
+    jump() {
+      if (this.player.isJumping) return false;
+      this.player.vy = this.physics.jumpVelocity;
+      this.player.isJumping = true;
+      if (!this.isRunning) this.start();
+      return true;
+    }
+
+    updatePlayer() {
+      const p = this.player;
+      p.y += p.vy;
+      p.vy += this.physics.gravity;
+
+      const floor = this.groundY - p.height;
+      if (p.y >= floor) {
+        p.y = floor;
+        p.vy = 0;
+        p.isJumping = false;
+      }
+    }
+
     start() {
       if (this.isRunning) return;
       this.isRunning = true;
@@ -149,6 +189,7 @@
 
     loop() {
       if (!this.isRunning) return;
+      this.updatePlayer();
       this.drawIdle();
       if (root.requestAnimationFrame) {
         this.frameId = root.requestAnimationFrame(() => this.loop());
@@ -157,6 +198,10 @@
 
     destroy() {
       this.pause();
+      const doc = this.target.ownerDocument || root.document;
+      if (doc && doc.removeEventListener && this.onKeyDown) {
+        doc.removeEventListener('keydown', this.onKeyDown);
+      }
       if (this.el) this.el.remove();
     }
   }
