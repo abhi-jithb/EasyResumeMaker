@@ -20,6 +20,7 @@
       this.target = target;
       this.options = { ...DEFAULTS, ...options };
       this.isRunning = false;
+      this.isGameOver = false;
       this.frameId = null;
       this.groundY = this.options.height - 44;
       this.player = {
@@ -95,7 +96,13 @@
       this.pauseButton.textContent = 'Pause';
       this.pauseButton.addEventListener('click', () => this.pause());
 
-      this.actions.append(this.startButton, this.pauseButton);
+      this.restartButton = doc.createElement('button');
+      this.restartButton.type = 'button';
+      this.restartButton.className = 'resume-runner__button secondary';
+      this.restartButton.textContent = 'Restart';
+      this.restartButton.addEventListener('click', () => this.restart());
+
+      this.actions.append(this.startButton, this.pauseButton, this.restartButton);
       this.el.append(header, this.canvas, this.actions);
       this.target.append(this.el);
     }
@@ -241,6 +248,7 @@
 
     start() {
       if (this.isRunning) return;
+      if (this.isGameOver) this.restart(false);
       this.isRunning = true;
       this.status.textContent = 'Running';
       this.loop();
@@ -248,11 +256,50 @@
 
     pause() {
       this.isRunning = false;
-      this.status.textContent = 'Paused';
+      if (!this.isGameOver) this.status.textContent = 'Paused';
       if (this.frameId && root.cancelAnimationFrame) {
         root.cancelAnimationFrame(this.frameId);
       }
       this.frameId = null;
+    }
+
+    restart(shouldStart = true) {
+      this.pause();
+      this.isGameOver = false;
+      this.obstacles = [];
+      this.spawnTimer = 0;
+      this.player.y = this.groundY - this.player.height;
+      this.player.vy = 0;
+      this.player.isJumping = false;
+      this.status.textContent = 'Ready';
+      this.drawIdle();
+      if (shouldStart) this.start();
+    }
+
+    intersects(a, b) {
+      return a.x < b.x + b.width &&
+        a.x + a.width > b.x &&
+        a.y < b.y + b.height &&
+        a.y + a.height > b.y;
+    }
+
+    checkCollisions() {
+      return this.obstacles.some(obstacle => this.intersects(this.player, obstacle));
+    }
+
+    gameOver() {
+      this.isGameOver = true;
+      this.pause();
+      this.status.textContent = 'Needs retry';
+      if (!this.ctx) return;
+      this.ctx.fillStyle = 'rgba(17, 17, 22, .72)';
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      this.ctx.fillStyle = '#e8ff47';
+      this.ctx.font = '22px sans-serif';
+      this.ctx.fillText('Interview delayed. Try another run.', 28, 54);
+      this.ctx.fillStyle = '#f0ede8';
+      this.ctx.font = '14px sans-serif';
+      this.ctx.fillText('Press restart, space, or tap to help your resume recover.', 28, 82);
     }
 
     loop() {
@@ -260,6 +307,10 @@
       this.updatePlayer();
       this.updateObstacles();
       this.drawIdle();
+      if (this.checkCollisions()) {
+        this.gameOver();
+        return;
+      }
       if (root.requestAnimationFrame) {
         this.frameId = root.requestAnimationFrame(() => this.loop());
       }

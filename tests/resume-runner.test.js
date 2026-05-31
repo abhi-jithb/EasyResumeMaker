@@ -107,6 +107,26 @@ runner.pause();
 assert.equal(runner.isRunning, false);
 assert.equal(runner.status.textContent, 'Paused');
 
+assert.equal(runner.intersects({ x: 0, y: 0, width: 10, height: 10 }, { x: 5, y: 5, width: 10, height: 10 }), true);
+assert.equal(runner.intersects({ x: 0, y: 0, width: 10, height: 10 }, { x: 20, y: 20, width: 10, height: 10 }), false);
+
+runner.obstacles = [{
+  type: 'ats',
+  x: runner.player.x,
+  y: runner.player.y,
+  width: runner.player.width,
+  height: runner.player.height
+}];
+assert.equal(runner.checkCollisions(), true);
+runner.gameOver();
+assert.equal(runner.isGameOver, true);
+assert.equal(runner.status.textContent, 'Needs retry');
+
+runner.restart(false);
+assert.equal(runner.isGameOver, false);
+assert.equal(runner.obstacles.length, 0);
+assert.equal(runner.status.textContent, 'Ready');
+
 runner.destroy();
 assert.equal(runner.el.removed, true);
 
