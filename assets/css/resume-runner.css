@@ -1,0 +1,71 @@
+.resume-runner {
+  border: 1px solid var(--border, #2a2a35);
+  background: var(--card, #18181f);
+  color: var(--txt, #f0ede8);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.resume-runner__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.resume-runner__title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.35rem;
+  line-height: 1.1;
+}
+
+.resume-runner__message {
+  color: var(--txt2, #9b9898);
+  font-size: .82rem;
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+.resume-runner__status {
+  color: var(--accent, #e8ff47);
+  font-family: 'DM Mono', monospace;
+  font-size: .68rem;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.resume-runner__canvas {
+  background: linear-gradient(180deg, rgba(232, 255, 71, .08), transparent 58%), var(--bg2, #171720);
+  border: 1px solid var(--border, #2a2a35);
+  border-radius: 8px;
+  display: block;
+  height: auto;
+  max-width: 100%;
+  width: 100%;
+}
+
+.resume-runner__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.resume-runner__button {
+  background: var(--accent, #e8ff47);
+  border: 0;
+  border-radius: 6px;
+  color: #111116;
+  cursor: pointer;
+  font-family: 'DM Mono', monospace;
+  font-size: .72rem;
+  font-weight: 700;
+  padding: 9px 12px;
+}
+
+.resume-runner__button.secondary {
+  background: transparent;
+  border: 1px solid var(--border, #2a2a35);
+  color: var(--txt, #f0ede8);
+}
