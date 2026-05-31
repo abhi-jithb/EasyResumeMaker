@@ -37,6 +37,9 @@
       };
       this.speed = 5;
       this.spawnTimer = 0;
+      this.score = 0;
+      this.highScoreKey = 'easyresume.resumeRunner.highScore';
+      this.highScore = this.readHighScore();
       this.obstacles = [];
       this.obstacleTypes = [
         { type: 'ats', label: 'ATS robot', width: 34, height: 38 },
@@ -69,7 +72,7 @@
 
       this.status = doc.createElement('div');
       this.status.className = 'resume-runner__status';
-      this.status.textContent = 'Ready';
+      this.updateStatus('Ready');
 
       header.append(intro, this.status);
 
@@ -139,6 +142,9 @@
       this.ctx.fillStyle = '#f0ede8';
       this.ctx.font = '14px sans-serif';
       this.ctx.fillText('Press start, then help your resume reach the interview.', 28, 76);
+      this.ctx.fillStyle = '#9b9898';
+      this.ctx.font = '12px sans-serif';
+      this.ctx.fillText(`Score ${this.score} · Best ${this.highScore}`, 28, 98);
       this.obstacles.forEach(obstacle => this.drawObstacle(obstacle));
     }
 
@@ -216,6 +222,15 @@
       this.obstacles = this.obstacles.filter(obstacle => obstacle.x + obstacle.width > -20);
     }
 
+    updateScore() {
+      this.score += 1;
+      if (this.score > this.highScore) {
+        this.highScore = this.score;
+        this.writeHighScore(this.highScore);
+      }
+      this.updateStatus('Running');
+    }
+
     drawObstacle(obstacle) {
       if (!this.ctx) return;
       this.ctx.fillStyle = '#ff6b47';
@@ -250,13 +265,13 @@
       if (this.isRunning) return;
       if (this.isGameOver) this.restart(false);
       this.isRunning = true;
-      this.status.textContent = 'Running';
+      this.updateStatus('Running');
       this.loop();
     }
 
     pause() {
       this.isRunning = false;
-      if (!this.isGameOver) this.status.textContent = 'Paused';
+      if (!this.isGameOver) this.updateStatus('Paused');
       if (this.frameId && root.cancelAnimationFrame) {
         root.cancelAnimationFrame(this.frameId);
       }
@@ -268,10 +283,11 @@
       this.isGameOver = false;
       this.obstacles = [];
       this.spawnTimer = 0;
+      this.score = 0;
       this.player.y = this.groundY - this.player.height;
       this.player.vy = 0;
       this.player.isJumping = false;
-      this.status.textContent = 'Ready';
+      this.updateStatus('Ready');
       this.drawIdle();
       if (shouldStart) this.start();
     }
@@ -290,7 +306,7 @@
     gameOver() {
       this.isGameOver = true;
       this.pause();
-      this.status.textContent = 'Needs retry';
+      this.updateStatus('Needs retry');
       if (!this.ctx) return;
       this.ctx.fillStyle = 'rgba(17, 17, 22, .72)';
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -302,10 +318,29 @@
       this.ctx.fillText('Press restart, space, or tap to help your resume recover.', 28, 82);
     }
 
+    updateStatus(label) {
+      if (!this.status) return;
+      this.status.textContent = `${label} · Score ${this.score} · Best ${this.highScore}`;
+    }
+
+    readHighScore() {
+      const storage = root.localStorage;
+      if (!storage || !storage.getItem) return 0;
+      const value = Number(storage.getItem(this.highScoreKey));
+      return Number.isFinite(value) && value > 0 ? Math.floor(value) : 0;
+    }
+
+    writeHighScore(score) {
+      const storage = root.localStorage;
+      if (!storage || !storage.setItem) return;
+      storage.setItem(this.highScoreKey, String(score));
+    }
+
     loop() {
       if (!this.isRunning) return;
       this.updatePlayer();
       this.updateObstacles();
+      this.updateScore();
       this.drawIdle();
       if (this.checkCollisions()) {
         this.gameOver();
