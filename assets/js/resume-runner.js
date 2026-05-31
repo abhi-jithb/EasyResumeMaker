@@ -34,6 +34,15 @@
         gravity: 0.72,
         jumpVelocity: -12.5
       };
+      this.speed = 5;
+      this.spawnTimer = 0;
+      this.obstacles = [];
+      this.obstacleTypes = [
+        { type: 'ats', label: 'ATS robot', width: 34, height: 38 },
+        { type: 'link', label: 'Broken link', width: 32, height: 28 },
+        { type: 'deadline', label: 'Deadline', width: 28, height: 42 },
+        { type: 'error', label: 'Error icon', width: 30, height: 30 }
+      ];
       this.mount();
       this.drawIdle();
       this.bindControls();
@@ -123,6 +132,7 @@
       this.ctx.fillStyle = '#f0ede8';
       this.ctx.font = '14px sans-serif';
       this.ctx.fillText('Press start, then help your resume reach the interview.', 28, 76);
+      this.obstacles.forEach(obstacle => this.drawObstacle(obstacle));
     }
 
     drawPlayer() {
@@ -171,6 +181,64 @@
       }
     }
 
+    createObstacle(typeConfig = this.obstacleTypes[0]) {
+      return {
+        ...typeConfig,
+        x: this.options.width + 20,
+        y: this.groundY - typeConfig.height
+      };
+    }
+
+    spawnObstacle() {
+      const index = this.obstacles.length % this.obstacleTypes.length;
+      const obstacle = this.createObstacle(this.obstacleTypes[index]);
+      this.obstacles.push(obstacle);
+      return obstacle;
+    }
+
+    updateObstacles() {
+      this.spawnTimer += 1;
+      if (this.spawnTimer >= 80) {
+        this.spawnObstacle();
+        this.spawnTimer = 0;
+      }
+
+      this.obstacles.forEach(obstacle => {
+        obstacle.x -= this.speed;
+      });
+      this.obstacles = this.obstacles.filter(obstacle => obstacle.x + obstacle.width > -20);
+    }
+
+    drawObstacle(obstacle) {
+      if (!this.ctx) return;
+      this.ctx.fillStyle = '#ff6b47';
+      this.ctx.strokeStyle = '#111116';
+
+      if (obstacle.type === 'ats') {
+        this.ctx.fillRect(obstacle.x, obstacle.y + 8, obstacle.width, obstacle.height - 8);
+        this.ctx.strokeRect(obstacle.x, obstacle.y + 8, obstacle.width, obstacle.height - 8);
+        this.ctx.fillStyle = '#e8ff47';
+        this.ctx.fillRect(obstacle.x + 8, obstacle.y + 17, 5, 5);
+        this.ctx.fillRect(obstacle.x + 21, obstacle.y + 17, 5, 5);
+      } else if (obstacle.type === 'link') {
+        this.ctx.strokeRect(obstacle.x, obstacle.y + 8, obstacle.width, 12);
+        this.ctx.beginPath();
+        this.ctx.moveTo(obstacle.x + 8, obstacle.y);
+        this.ctx.lineTo(obstacle.x + obstacle.width - 8, obstacle.y + obstacle.height);
+        this.ctx.stroke();
+      } else if (obstacle.type === 'deadline') {
+        this.ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        this.ctx.fillStyle = '#111116';
+        this.ctx.fillText('!', obstacle.x + 10, obstacle.y + 26);
+      } else {
+        this.ctx.beginPath();
+        this.ctx.arc(obstacle.x + 15, obstacle.y + 15, 14, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.fillStyle = '#111116';
+        this.ctx.fillText('x', obstacle.x + 11, obstacle.y + 20);
+      }
+    }
+
     start() {
       if (this.isRunning) return;
       this.isRunning = true;
@@ -190,6 +258,7 @@
     loop() {
       if (!this.isRunning) return;
       this.updatePlayer();
+      this.updateObstacles();
       this.drawIdle();
       if (root.requestAnimationFrame) {
         this.frameId = root.requestAnimationFrame(() => this.loop());

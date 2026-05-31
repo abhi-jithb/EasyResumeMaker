@@ -35,6 +35,7 @@ function makeElement(tagName) {
         beginPath() {},
         moveTo() {},
         lineTo() {},
+        arc() {},
         stroke() {},
         fillText() {}
       };
@@ -73,6 +74,8 @@ assert.equal(runner.status.textContent, 'Ready');
 assert.equal(runner.player.width, 34);
 assert.equal(runner.player.height, 46);
 assert.equal(runner.player.y, runner.groundY - runner.player.height);
+assert.equal(runner.obstacleTypes.length, 4);
+assert.deepEqual(runner.obstacleTypes.map(item => item.type), ['ats', 'link', 'deadline', 'error']);
 assert.equal(typeof runner.canvas.onpointerdown, 'function');
 assert.equal(typeof documentStub.listeners.keydown, 'function');
 
@@ -85,6 +88,16 @@ assert.ok(runner.player.y < runner.groundY - runner.player.height);
 for (let i = 0; i < 60; i += 1) runner.updatePlayer();
 assert.equal(runner.player.isJumping, false);
 assert.equal(runner.player.y, runner.groundY - runner.player.height);
+
+const obstacle = runner.spawnObstacle();
+assert.equal(obstacle.type, 'ats');
+const firstX = obstacle.x;
+runner.updateObstacles();
+assert.ok(obstacle.x < firstX);
+
+runner.spawnTimer = 79;
+runner.updateObstacles();
+assert.ok(runner.obstacles.length >= 2);
 
 runner.start();
 assert.equal(runner.isRunning, true);
