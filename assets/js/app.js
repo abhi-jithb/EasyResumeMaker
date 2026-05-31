@@ -190,7 +190,7 @@
       } catch (e) {
         setStage('stage-parse', 'waiting', 'failed ✗');
         window.EasyResumeAnalytics.track('generate_failed', { stage: 'parse', error_code: e.code || 'ai_failed', source_type: source.type });
-        showError('AI parsing failed. ' + getFriendlyApiError(e));
+        showError(window.EasyResumeErrors.aiGenerationErrorMessage(e));
         setGenerateButtonState('idle');
         return;
       }
@@ -459,6 +459,20 @@
 
     // ===== PDF DOWNLOAD =====
     function downloadPDF() {
+      if (!resumeData) {
+        showToast('Your future resume is waiting here 👀. Generate it first, then I can package the PDF.', 'error');
+        return;
+      }
+
+      try {
+        buildAndSavePDF();
+      } catch (error) {
+        window.EasyResumeAnalytics.track('pdf_download_failed', { template: selectedTemplate, error_code: 'pdf_failed' });
+        showToast(window.EasyResumeErrors.pdfErrorMessage(error), 'error');
+      }
+    }
+
+    function buildAndSavePDF() {
       if (!resumeData) return;
       const d = resumeData;
       const tpl = selectedTemplate;
@@ -982,7 +996,7 @@
       } catch (error) {
         output.textContent = getFriendlyApiError(error);
         window.EasyResumeAnalytics.track('resume_improve_failed', { error_code: error.code || 'ai_failed' });
-        showToast('Could not improve that text. Please try again.', 'error');
+        showToast('The editor tripped over that sentence. Let’s try once more.', 'error');
       } finally {
         improveBtn.disabled = false;
         improveBtn.textContent = 'Improve';
@@ -998,7 +1012,7 @@
         await copyTextToClipboard(text);
         showToast('Improved text copied!');
       } catch (error) {
-        showToast('Failed to copy improved text.', 'error');
+        showToast('Clipboard missed the handoff. Please try copying again.', 'error');
       }
     }
 

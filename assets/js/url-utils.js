@@ -25,11 +25,11 @@
   function normalizePublicUrl(value) {
     const input = String(value || '').trim();
     if (!input) {
-      return { ok: false, message: 'Please enter a public URL — your portfolio, GitHub profile, or similar.' };
+      return { ok: false, message: 'Your resume needs a place to start 👀. Paste a public portfolio, GitHub profile, Dev.to, Hashnode, blog, or personal website URL.' };
     }
 
     if (/\s/.test(input)) {
-      return { ok: false, message: 'That URL has spaces in it. Paste a single public link and try again.' };
+      return { ok: false, message: 'That link brought a few extra passengers. Paste one clean public URL without spaces.' };
     }
 
     const withProtocol = /^[a-z][a-z0-9+.-]*:\/\//i.test(input) ? input : `https://${input}`;
@@ -38,28 +38,28 @@
     try {
       parsed = new URL(withProtocol);
     } catch (error) {
-      return { ok: false, message: 'That URL does not look valid. Try a link like github.com/your-username.' };
+      return { ok: false, message: 'That link looks a little scrambled. Try something like github.com/your-username.' };
     }
 
     if (!['http:', 'https:'].includes(parsed.protocol)) {
-      return { ok: false, message: 'Only public http and https links can be used.' };
+      return { ok: false, message: 'I can only read regular public web links: http or https.' };
     }
 
     if (parsed.username || parsed.password) {
-      return { ok: false, message: 'Remove usernames, passwords, or tokens from the URL before generating a resume.' };
+      return { ok: false, message: 'For your safety, remove usernames, passwords, or tokens from the URL before generating a resume.' };
     }
 
     const hostname = parsed.hostname.toLowerCase();
     if (UNSUPPORTED_HOSTS.has(hostname)) {
-      return { ok: false, message: 'That source is not supported. Use a GitHub profile, public portfolio, Dev.to, Hashnode, public blog, or personal website instead.' };
+      return { ok: false, message: 'That source is camera-shy and not supported. Use a GitHub profile, public portfolio, Dev.to, Hashnode, public blog, or personal website instead.' };
     }
 
     if (PRIVATE_HOSTS.has(hostname) || isPrivateIPv4(hostname)) {
-      return { ok: false, message: 'Use a public URL, not a localhost or private network address.' };
+      return { ok: false, message: 'That URL lives on a private island. Use a public link we can actually read.' };
     }
 
     if (!hostname.includes('.') && !hostname.startsWith('[')) {
-      return { ok: false, message: 'That URL needs a public domain, like github.com/your-username.' };
+      return { ok: false, message: 'That URL needs a real public domain, like github.com/your-username.' };
     }
 
     parsed.hash = '';

@@ -8,12 +8,12 @@
   }
 })(typeof window !== 'undefined' ? window : globalThis, function () {
   const API_MESSAGES = {
-    rate_limited: 'Too many AI requests. Please wait a few minutes, then try again.',
-    server_misconfigured: 'The AI service is not configured yet. Add the provider API key in the deployment environment.',
-    missing_input: 'There is not enough content for the AI to work with. Try a fuller portfolio, GitHub profile, Dev.to profile, Hashnode blog, or public personal website.',
-    invalid_ai_json: 'The AI returned a response we could not read. Please try again.',
-    method_not_allowed: 'That action is not available from this page.',
-    ai_failed: 'The AI service could not complete the request. Please try again in a moment.'
+    rate_limited: 'Tiny traffic jam at resume HQ 🚦. Give it a few minutes, then we can try again.',
+    server_misconfigured: 'The resume engine is missing its backstage pass. Add the provider API key in the deployment environment.',
+    missing_input: 'I need a little more to work with 👀. Try a fuller portfolio, GitHub profile, Dev.to profile, Hashnode blog, or public personal website.',
+    invalid_ai_json: 'The resume draft came back speaking in riddles. Let’s ask for a cleaner version.',
+    method_not_allowed: 'That button tried to use the wrong door. Refresh the page and try again.',
+    ai_failed: 'Looks like our resume robot dropped its coffee ☕. Let’s try that again.'
   };
 
   function apiErrorMessage(error) {
@@ -26,15 +26,15 @@
 
   function fetchErrorMessage(error) {
     const detail = error?.message ? ` (${error.message})` : '';
-    return `Could not read that URL. Make sure it is public, not blocked by login, and has visible resume content.${detail}`;
+    return `Your internet, that page, or our reader took a small nap 😴. Make sure the URL is public, readable without login, and has visible resume content.${detail}`;
   }
 
   function lowContentMessage(characterCount) {
     return [
-      'This page may be JavaScript-rendered or too sparse to build a resume.',
-      `Only ${characterCount} characters were extracted, which is not enough for reliable resume generation.`,
+      'This page is playing a little too hard to get.',
+      `We found only ${characterCount} characters, which is not enough to build a resume we would trust.`,
       '',
-      'Try one of these instead:',
+      'Try a source with more visible text, such as:',
       '  - github.com/your-username',
       '  - dev.to/your-username',
       '  - hashnode.dev/@your-username',
@@ -42,9 +42,20 @@
     ].join('\n');
   }
 
+  function aiGenerationErrorMessage(error) {
+    return `The AI got a little tangled in the resume yarn 🧶. ${apiErrorMessage(error)}`;
+  }
+
+  function pdfErrorMessage(error) {
+    const detail = error?.message ? ` (${error.message})` : '';
+    return `The PDF press jammed for a second 📄. Your preview is safe, so please try downloading again.${detail}`;
+  }
+
   return {
+    aiGenerationErrorMessage,
     apiErrorMessage,
     fetchErrorMessage,
-    lowContentMessage
+    lowContentMessage,
+    pdfErrorMessage
   };
 });
