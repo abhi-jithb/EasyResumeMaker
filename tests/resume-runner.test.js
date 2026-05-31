@@ -30,6 +30,7 @@ function makeElement(tagName) {
       return {
         clearRect() {},
         fillRect() {},
+        strokeRect() {},
         beginPath() {},
         moveTo() {},
         lineTo() {},
@@ -61,6 +62,9 @@ assert.equal(mount.children.length, 1);
 assert.equal(runner.canvas.width, 640);
 assert.equal(runner.canvas.height, 220);
 assert.equal(runner.status.textContent, 'Ready');
+assert.equal(runner.player.width, 34);
+assert.equal(runner.player.height, 46);
+assert.equal(runner.player.y, runner.groundY - runner.player.height);
 
 runner.start();
 assert.equal(runner.isRunning, true);

@@ -21,6 +21,15 @@
       this.options = { ...DEFAULTS, ...options };
       this.isRunning = false;
       this.frameId = null;
+      this.groundY = this.options.height - 44;
+      this.player = {
+        x: 64,
+        y: this.groundY - 46,
+        width: 34,
+        height: 46,
+        vy: 0,
+        isJumping: false
+      };
       this.mount();
       this.drawIdle();
     }
@@ -88,12 +97,38 @@
       this.ctx.moveTo(24, height - 44);
       this.ctx.lineTo(width - 24, height - 44);
       this.ctx.stroke();
+      this.drawPlayer();
       this.ctx.fillStyle = '#e8ff47';
       this.ctx.font = '20px sans-serif';
       this.ctx.fillText('Resume Runner', 28, 48);
       this.ctx.fillStyle = '#f0ede8';
       this.ctx.font = '14px sans-serif';
       this.ctx.fillText('Press start, then help your resume reach the interview.', 28, 76);
+    }
+
+    drawPlayer() {
+      if (!this.ctx) return;
+      const p = this.player;
+      this.ctx.fillStyle = '#f0ede8';
+      this.ctx.fillRect(p.x, p.y, p.width, p.height);
+      this.ctx.strokeStyle = '#111116';
+      this.ctx.strokeRect(p.x, p.y, p.width, p.height);
+
+      this.ctx.fillStyle = '#e8ff47';
+      this.ctx.fillRect(p.x + p.width - 10, p.y, 10, 10);
+
+      this.ctx.strokeStyle = '#2a2a35';
+      for (let i = 0; i < 4; i += 1) {
+        const lineY = p.y + 16 + (i * 7);
+        this.ctx.beginPath();
+        this.ctx.moveTo(p.x + 7, lineY);
+        this.ctx.lineTo(p.x + p.width - 7, lineY);
+        this.ctx.stroke();
+      }
+
+      this.ctx.fillStyle = '#47ffb2';
+      this.ctx.fillRect(p.x + 6, p.y + p.height - 3, 9, 3);
+      this.ctx.fillRect(p.x + 21, p.y + p.height - 3, 9, 3);
     }
 
     start() {
