@@ -98,6 +98,10 @@
       padding: 54px 0 24px;
     }
 
+    .layout > * {
+      min-width: 0;
+    }
+
     .eyebrow {
       color: var(--accent);
       font-family: 'DM Mono', monospace;
@@ -176,6 +180,7 @@
       background: linear-gradient(180deg, rgba(240, 237, 232, .04), rgba(240, 237, 232, .015));
       border: 1px solid var(--border);
       border-radius: 18px;
+      max-width: 640px;
       overflow: hidden;
       padding: 16px;
       transform: perspective(1000px) rotateX(calc(var(--py) * -1deg)) rotateY(calc(var(--px) * 1deg));
@@ -185,6 +190,7 @@
     svg {
       display: block;
       height: auto;
+      max-height: min(62vh, 560px);
       width: 100%;
     }
 
@@ -253,6 +259,10 @@
         grid-template-columns: 1fr;
         padding-top: 38px;
       }
+
+      .scene-card {
+        margin: 0 auto;
+      }
     }
 
     @media (max-width: 520px) {
@@ -266,6 +276,45 @@
 
       .btn {
         width: 100%;
+      }
+
+      h1 {
+        font-size: clamp(2.15rem, 12vw, 3.2rem);
+      }
+
+      .copy {
+        font-size: .92rem;
+      }
+
+      .scene-card {
+        border-radius: 14px;
+        padding: 10px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .page {
+        padding: 14px;
+      }
+
+      nav {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .badge {
+        width: fit-content;
+      }
+    }
+
+    @media (min-width: 1280px) {
+      .page {
+        max-width: 1180px;
+      }
+
+      .scene-card {
+        justify-self: end;
       }
     }
 

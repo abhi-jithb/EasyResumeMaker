@@ -28,6 +28,11 @@ assert.ok(notFound.includes('404 link'), '404 page should include broken link si
 assert.ok(notFound.includes('Interview'), '404 page should include interview room door');
 assert.ok(notFound.includes('steam'), '404 page should include coffee steam');
 assert.ok(notFound.includes('prefers-reduced-motion'), '404 page should respect reduced motion');
+assert.ok(notFound.includes('@media (max-width: 820px)'), '404 page should adapt for tablets');
+assert.ok(notFound.includes('@media (max-width: 520px)'), '404 page should adapt for mobile');
+assert.ok(notFound.includes('@media (max-width: 360px)'), '404 page should adapt for narrow phones');
+assert.ok(notFound.includes('@media (min-width: 1280px)'), '404 page should adapt for large screens');
+assert.ok(notFound.includes('max-height: min(62vh, 560px)'), '404 illustration should be viewport constrained');
 assert.ok(notFound.includes('pointermove'), '404 page should include cursor parallax');
 assert.ok(notFound.includes('messages = ['), '404 page should rotate status messages');
 assert.ok(notFound.includes('ATS bot says'), '404 page should include ATS bot easter egg');
