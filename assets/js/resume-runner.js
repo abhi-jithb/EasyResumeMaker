@@ -38,6 +38,7 @@
       this.speed = 5;
       this.spawnTimer = 0;
       this.score = 0;
+      this.frame = 0;
       this.highScoreKey = 'easyresume.resumeRunner.highScore';
       this.highScore = this.readHighScore();
       this.obstacles = [];
@@ -145,6 +146,8 @@
       this.ctx.moveTo(24, height - 44);
       this.ctx.lineTo(width - 24, height - 44);
       this.ctx.stroke();
+      this.drawMotionLines();
+      this.drawInterviewMarker();
       this.drawPlayer();
       this.ctx.fillStyle = '#e8ff47';
       this.ctx.font = '20px sans-serif';
@@ -156,6 +159,35 @@
       this.ctx.font = '12px sans-serif';
       this.ctx.fillText(`Score ${this.score} · Best ${this.highScore}`, 28, 98);
       this.obstacles.forEach(obstacle => this.drawObstacle(obstacle));
+    }
+
+    drawMotionLines() {
+      if (!this.ctx || !this.isRunning) return;
+      this.ctx.strokeStyle = 'rgba(232, 255, 71, .28)';
+      for (let i = 0; i < 4; i += 1) {
+        const x = ((this.frame * 6) + (i * 160)) % this.canvas.width;
+        const y = 118 + (i % 2) * 24;
+        this.ctx.beginPath();
+        this.ctx.moveTo(x, y);
+        this.ctx.lineTo(x + 46, y);
+        this.ctx.stroke();
+      }
+    }
+
+    drawInterviewMarker() {
+      if (!this.ctx) return;
+      const x = this.canvas.width - 96;
+      const y = this.groundY - 74;
+      this.ctx.strokeStyle = '#47ffb2';
+      this.ctx.beginPath();
+      this.ctx.moveTo(x, y);
+      this.ctx.lineTo(x, this.groundY);
+      this.ctx.stroke();
+      this.ctx.fillStyle = '#47ffb2';
+      this.ctx.fillRect(x, y, 58, 22);
+      this.ctx.fillStyle = '#111116';
+      this.ctx.font = '11px sans-serif';
+      this.ctx.fillText('Interview', x + 6, y + 15);
     }
 
     drawPlayer() {
@@ -181,6 +213,18 @@
       this.ctx.fillStyle = '#47ffb2';
       this.ctx.fillRect(p.x + 6, p.y + p.height - 3, 9, 3);
       this.ctx.fillRect(p.x + 21, p.y + p.height - 3, 9, 3);
+      this.drawDust();
+    }
+
+    drawDust() {
+      if (!this.ctx || !this.isRunning || this.player.isJumping) return;
+      this.ctx.fillStyle = 'rgba(155, 152, 152, .45)';
+      const baseX = this.player.x - 10;
+      const baseY = this.groundY - 8;
+      for (let i = 0; i < 3; i += 1) {
+        const offset = (this.frame + i * 8) % 18;
+        this.ctx.fillRect(baseX - offset, baseY + (i * 2), 3, 3);
+      }
     }
 
     jump() {
@@ -294,6 +338,7 @@
       this.obstacles = [];
       this.spawnTimer = 0;
       this.score = 0;
+      this.frame = 0;
       this.player.y = this.groundY - this.player.height;
       this.player.vy = 0;
       this.player.isJumping = false;
@@ -351,6 +396,7 @@
       this.updatePlayer();
       this.updateObstacles();
       this.updateScore();
+      this.frame += 1;
       this.drawIdle();
       if (this.checkCollisions()) {
         this.gameOver();

@@ -66,6 +66,16 @@
   font-size: .72rem;
   font-weight: 700;
   padding: 9px 12px;
+  transition: transform .18s ease, filter .18s ease, border-color .18s ease;
+}
+
+.resume-runner__button:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+.resume-runner__button:active {
+  transform: translateY(0);
 }
 
 .resume-runner__button.secondary {

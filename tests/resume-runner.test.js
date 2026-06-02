@@ -116,6 +116,7 @@ runner.start();
 assert.equal(runner.isRunning, true);
 assert.equal(runner.score, 1);
 assert.equal(runner.highScore, 1);
+assert.equal(runner.frame, 1);
 assert.equal(runner.status.textContent, 'Running · Score 1 · Best 1');
 assert.equal(global.localStorage.values['easyresume.resumeRunner.highScore'], '1');
 
@@ -142,6 +143,7 @@ runner.restart(false);
 assert.equal(runner.isGameOver, false);
 assert.equal(runner.obstacles.length, 0);
 assert.equal(runner.score, 0);
+assert.equal(runner.frame, 0);
 assert.equal(runner.status.textContent, 'Ready · Score 0 · Best 1');
 
 runner.destroy();
