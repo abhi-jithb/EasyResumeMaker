@@ -1,0 +1,19 @@
+const assert = require('assert');
+const fs = require('fs');
+
+const html = fs.readFileSync('index.html', 'utf8');
+const css = fs.readFileSync('assets/css/living-ui.css', 'utf8');
+
+assert.ok(html.includes('assets/css/living-ui.css'), 'index should load living UI styles');
+assert.ok(html.includes('class="living-bg"'), 'index should include the living background layer');
+assert.ok(html.includes('aria-hidden="true"'), 'living background should be hidden from assistive tech');
+assert.ok(html.includes('living-bg__page'), 'living background should include resume pages');
+assert.ok(html.includes('living-bg__card'), 'living background should include portfolio cards');
+assert.ok(html.includes('living-bg__star'), 'living background should include stars');
+assert.ok(html.includes('living-bg__dot'), 'living background should include contribution dots');
+
+assert.ok(css.includes('pointer-events: none'), 'living background should not block interactions');
+assert.ok(css.includes('@media (prefers-reduced-motion: reduce)'), 'living UI should respect reduced motion');
+assert.ok(css.includes('will-change: transform'), 'animated elements should be GPU-friendly');
+
+console.log('living UI tests passed');

@@ -1,0 +1,161 @@
+/* Subtle ambient layer. Decorative only, with reduced-motion support. */
+.living-bg {
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: fixed;
+  z-index: 0;
+}
+
+.living-bg__item {
+  opacity: .18;
+  position: absolute;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
+.living-bg__page {
+  background: linear-gradient(180deg, rgba(240, 237, 232, .22), rgba(240, 237, 232, .08));
+  border: 1px solid rgba(240, 237, 232, .18);
+  border-radius: 4px;
+  height: 64px;
+  width: 46px;
+}
+
+.living-bg__page::before,
+.living-bg__page::after {
+  background: rgba(232, 255, 71, .42);
+  border-radius: 2px;
+  content: '';
+  height: 3px;
+  left: 9px;
+  position: absolute;
+}
+
+.living-bg__page::before {
+  top: 18px;
+  width: 24px;
+}
+
+.living-bg__page::after {
+  top: 29px;
+  width: 16px;
+}
+
+.living-bg__card {
+  border: 1px solid rgba(71, 255, 178, .2);
+  border-radius: 8px;
+  height: 46px;
+  width: 78px;
+}
+
+.living-bg__card::before {
+  background: rgba(71, 255, 178, .34);
+  border-radius: 2px;
+  content: '';
+  height: 4px;
+  left: 10px;
+  position: absolute;
+  top: 13px;
+  width: 42px;
+}
+
+.living-bg__star {
+  color: rgba(232, 255, 71, .44);
+  font-family: 'DM Mono', monospace;
+  font-size: 18px;
+}
+
+.living-bg__dot {
+  background: rgba(71, 255, 178, .36);
+  border-radius: 2px;
+  height: 5px;
+  width: 5px;
+}
+
+.living-bg__item:nth-child(1) {
+  animation: living-float-a 18s ease-in-out infinite;
+  left: 7%;
+  top: 18%;
+}
+
+.living-bg__item:nth-child(2) {
+  animation: living-float-b 22s ease-in-out infinite;
+  right: 9%;
+  top: 12%;
+}
+
+.living-bg__item:nth-child(3) {
+  animation: living-float-c 20s ease-in-out infinite;
+  left: 13%;
+  top: 70%;
+}
+
+.living-bg__item:nth-child(4) {
+  animation: living-float-a 24s ease-in-out infinite;
+  right: 15%;
+  top: 62%;
+}
+
+.living-bg__item:nth-child(5) {
+  animation: living-drift 16s ease-in-out infinite;
+  left: 4%;
+  top: 46%;
+}
+
+.living-bg__item:nth-child(6) {
+  animation: living-drift 19s ease-in-out infinite reverse;
+  right: 6%;
+  top: 42%;
+}
+
+.living-bg__item:nth-child(7) {
+  animation: living-float-b 21s ease-in-out infinite;
+  left: 24%;
+  top: 8%;
+}
+
+.living-bg__item:nth-child(8) {
+  animation: living-float-c 23s ease-in-out infinite;
+  right: 24%;
+  top: 82%;
+}
+
+@keyframes living-float-a {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-4deg); }
+  50% { transform: translate3d(10px, -18px, 0) rotate(3deg); }
+}
+
+@keyframes living-float-b {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(5deg); }
+  50% { transform: translate3d(-14px, 16px, 0) rotate(-2deg); }
+}
+
+@keyframes living-float-c {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(2deg); }
+  50% { transform: translate3d(18px, 10px, 0) rotate(6deg); }
+}
+
+@keyframes living-drift {
+  0%, 100% { transform: translate3d(0, 0, 0); opacity: .12; }
+  50% { transform: translate3d(0, -22px, 0); opacity: .28; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .living-bg__item {
+    animation: none;
+    will-change: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .living-bg__item {
+    opacity: .12;
+  }
+
+  .living-bg__item:nth-child(3),
+  .living-bg__item:nth-child(4),
+  .living-bg__item:nth-child(8) {
+    display: none;
+  }
+}
