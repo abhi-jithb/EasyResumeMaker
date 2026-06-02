@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>404 - Your Resume Took a Wrong Turn | EasyResume Maker</title>
+  <meta name="description" content="EasyResumeMaker could not find this page. Return home or generate a resume from GitHub, portfolios, blogs, and public personal websites.">
   <meta name="robots" content="noindex">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
@@ -90,6 +91,24 @@
       z-index: 1;
     }
 
+    .skip-link {
+      background: var(--accent);
+      border-radius: 0 0 8px 8px;
+      color: #111116;
+      font-weight: 800;
+      left: 18px;
+      padding: 10px 14px;
+      position: fixed;
+      top: 0;
+      transform: translateY(-120%);
+      transition: transform .18s ease;
+      z-index: 10;
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
     nav {
       align-items: center;
       border-bottom: 1px solid var(--border);
@@ -137,6 +156,13 @@
       gap: 7px;
       min-height: 32px;
       padding: 7px 12px;
+    }
+
+    a:focus-visible,
+    button:focus-visible,
+    [tabindex]:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 4px;
     }
 
     .layout {
@@ -424,8 +450,9 @@
 </head>
 
 <body>
-  <main class="page">
-    <nav>
+  <a class="skip-link" href="#notFoundContent">Skip to 404 content</a>
+  <main class="page" aria-labelledby="notFoundTitle">
+    <nav aria-label="404 page navigation">
       <div class="logo">Easy<span>Resume</span> Maker</div>
       <div class="nav-actions">
         <button class="theme-toggle" id="themeToggle404" type="button" aria-label="Switch color theme">
@@ -436,10 +463,10 @@
       </div>
     </nav>
 
-    <section class="layout">
+    <section class="layout" id="notFoundContent">
       <div>
         <div class="eyebrow">404 · Wrong turn detected</div>
-        <h1>404 - Your Resume Took a <em>Wrong Turn</em></h1>
+        <h1 id="notFoundTitle">404 - Your Resume Took a <em>Wrong Turn</em></h1>
         <p class="copy">We searched GitHub, portfolios, blogs, and recruiter inboxes.<br>This page doesn't exist.</p>
         <div class="status" id="statusMessage" aria-live="polite">Checking the recruiter inbox one more time...</div>
         <div class="actions">
@@ -495,7 +522,7 @@
               <path d="M59 52 V101" stroke="#2a2a35" stroke-width="4" />
             </g>
 
-            <g class="ats-bot" id="atsBot" transform="translate(338 298)">
+            <g class="ats-bot" id="atsBot" transform="translate(338 298)" role="button" tabindex="0" aria-label="Wake the ATS robot easter egg">
               <rect x="0" y="28" width="92" height="76" rx="16" fill="#20202b" stroke="#2a2a35" stroke-width="3" />
               <rect x="20" y="0" width="52" height="38" rx="12" fill="#2a2a35" />
               <path d="M46 0 V-18" stroke="#2a2a35" stroke-width="4" stroke-linecap="round" />
@@ -588,11 +615,20 @@
       statusEl.textContent = 'Careful. That broken link sign has opinions.';
     });
 
-    atsBot.addEventListener('click', () => {
+    function toggleAtsBot() {
       atsBot.classList.toggle('is-awake');
       atsNote.textContent = atsBot.classList.contains('is-awake')
         ? 'ATS bot says: “Fine, I’ll stop filtering joy.”'
         : 'Tiny easter egg: click the ATS bot if it looks too smug.';
+    }
+
+    atsBot.addEventListener('click', toggleAtsBot);
+
+    atsBot.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        toggleAtsBot();
+      }
     });
   </script>
 </body>

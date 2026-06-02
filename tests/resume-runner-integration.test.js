@@ -19,6 +19,8 @@ assert.ok(offline.includes('window.location.reload()'), 'offline page should inc
 assert.ok(offline.includes('assets/js/resume-runner.js'), 'offline page should reuse runner module');
 
 assert.ok(notFound.includes('404 - Your Resume Took a Wrong Turn'), '404 page should use the custom wrong-turn title');
+assert.ok(notFound.includes('meta name="description"'), '404 page should include a meta description');
+assert.ok(notFound.includes('meta name="robots" content="noindex"'), '404 page should be noindexed');
 assert.ok(notFound.includes('We searched GitHub, portfolios, blogs, and recruiter inboxes.'), '404 page should include required description');
 assert.ok(notFound.includes('Generate Resume'), '404 page should link to resume generation');
 assert.ok(notFound.includes('<svg'), '404 page should include an SVG illustration');
@@ -45,5 +47,11 @@ assert.ok(notFound.includes('interview-door'), '404 page should animate the inte
 assert.ok(notFound.includes('broken-sign'), '404 page should animate the broken link sign');
 assert.ok(notFound.includes('messages = ['), '404 page should rotate status messages');
 assert.ok(notFound.includes('ATS bot says'), '404 page should include ATS bot easter egg');
+assert.ok(notFound.includes('class="skip-link"'), '404 page should include a skip link');
+assert.ok(notFound.includes('aria-labelledby="notFoundTitle"'), '404 main content should be labelled');
+assert.ok(notFound.includes('aria-label="404 page navigation"'), '404 navigation should be labelled');
+assert.ok(notFound.includes('focus-visible'), '404 page should include visible keyboard focus states');
+assert.ok(notFound.includes('role="button" tabindex="0"'), '404 ATS easter egg should be keyboard reachable');
+assert.ok(notFound.includes("event.key === 'Enter'"), '404 ATS easter egg should respond to keyboard activation');
 
 console.log('resume runner integration tests passed');
