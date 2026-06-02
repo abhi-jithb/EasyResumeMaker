@@ -33,6 +33,11 @@ assert.ok(notFound.includes('@media (max-width: 520px)'), '404 page should adapt
 assert.ok(notFound.includes('@media (max-width: 360px)'), '404 page should adapt for narrow phones');
 assert.ok(notFound.includes('@media (min-width: 1280px)'), '404 page should adapt for large screens');
 assert.ok(notFound.includes('max-height: min(62vh, 560px)'), '404 illustration should be viewport constrained');
+assert.ok(notFound.includes('prefers-color-scheme: light'), '404 page should follow system light mode');
+assert.ok(notFound.includes('body.light-mode'), '404 page should support manual light mode');
+assert.ok(notFound.includes('id="themeToggle404"'), '404 page should include a theme toggle');
+assert.ok(notFound.includes("localStorage.getItem('theme')"), '404 page should reuse saved theme preference');
+assert.ok(notFound.includes('Switch to dark theme'), '404 theme toggle should expose state to assistive tech');
 assert.ok(notFound.includes('pointermove'), '404 page should include cursor parallax');
 assert.ok(notFound.includes('messages = ['), '404 page should rotate status messages');
 assert.ok(notFound.includes('ATS bot says'), '404 page should include ATS bot easter egg');

@@ -26,6 +26,34 @@
       --py: 0px;
     }
 
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #faf8f2;
+        --bg2: #f1eee6;
+        --card: #ffffff;
+        --border: #d9d3c7;
+        --txt: #18171c;
+        --txt2: #57535c;
+        --txt3: #807985;
+        --accent: #456800;
+        --accent2: #b84324;
+        --success: #087a55;
+      }
+    }
+
+    body.light-mode {
+      --bg: #faf8f2;
+      --bg2: #f1eee6;
+      --card: #ffffff;
+      --border: #d9d3c7;
+      --txt: #18171c;
+      --txt2: #57535c;
+      --txt3: #807985;
+      --accent: #456800;
+      --accent2: #b84324;
+      --success: #087a55;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -88,6 +116,27 @@
       font-size: .68rem;
       padding: 7px 12px;
       text-decoration: none;
+    }
+
+    .nav-actions {
+      align-items: center;
+      display: flex;
+      gap: 10px;
+    }
+
+    .theme-toggle {
+      align-items: center;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--txt);
+      cursor: pointer;
+      display: inline-flex;
+      font-family: 'DM Mono', monospace;
+      font-size: .68rem;
+      gap: 7px;
+      min-height: 32px;
+      padding: 7px 12px;
     }
 
     .layout {
@@ -306,6 +355,10 @@
       .badge {
         width: fit-content;
       }
+
+      .nav-actions {
+        width: 100%;
+      }
     }
 
     @media (min-width: 1280px) {
@@ -338,7 +391,13 @@
   <main class="page">
     <nav>
       <div class="logo">Easy<span>Resume</span> Maker</div>
-      <a class="badge" href="/">Back Home</a>
+      <div class="nav-actions">
+        <button class="theme-toggle" id="themeToggle404" type="button" aria-label="Switch color theme">
+          <span id="themeGlyph404" aria-hidden="true">☾</span>
+          <span>Theme</span>
+        </button>
+        <a class="badge" href="/">Back Home</a>
+      </div>
     </nav>
 
     <section class="layout">
@@ -452,8 +511,27 @@
     const scene = document.getElementById('sceneCard');
     const atsBot = document.getElementById('atsBot');
     const atsNote = document.getElementById('atsNote');
+    const themeToggle = document.getElementById('themeToggle404');
+    const themeGlyph = document.getElementById('themeGlyph404');
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let index = 0;
+
+    function applyTheme(theme) {
+      const useLight = theme === 'light';
+      document.body.classList.toggle('light-mode', useLight);
+      themeGlyph.textContent = useLight ? '☀' : '☾';
+      themeToggle.setAttribute('aria-label', useLight ? 'Switch to dark theme' : 'Switch to light theme');
+    }
+
+    const savedTheme = window.localStorage.getItem('theme');
+    const systemLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+    applyTheme(savedTheme || (systemLight ? 'light' : 'dark'));
+
+    themeToggle.addEventListener('click', () => {
+      const nextTheme = document.body.classList.contains('light-mode') ? 'dark' : 'light';
+      window.localStorage.setItem('theme', nextTheme);
+      applyTheme(nextTheme);
+    });
 
     if (!reduceMotion) {
       window.setInterval(() => {
