@@ -13,6 +13,8 @@ assert.ok(html.includes('living-bg__page'), 'living background should include re
 assert.ok(html.includes('living-bg__card'), 'living background should include portfolio cards');
 assert.ok(html.includes('living-bg__star'), 'living background should include stars');
 assert.ok(html.includes('living-bg__dot'), 'living background should include contribution dots');
+assert.ok(html.includes('id="resume-empty-state"'), 'index should include animated empty state');
+assert.ok(html.includes('Your future resume is waiting here'), 'empty state should use friendly waiting copy');
 
 assert.ok(css.includes('pointer-events: none'), 'living background should not block interactions');
 assert.ok(css.includes('@media (prefers-reduced-motion: reduce)'), 'living UI should respect reduced motion');
@@ -22,6 +24,10 @@ assert.ok(css.includes('living-rise'), 'living UI should include card rise anima
 assert.ok(css.includes('living-success-sweep'), 'living UI should include success state animation');
 assert.ok(css.includes('.btn-dl:hover'), 'living UI should include button hover microinteractions');
 assert.ok(css.includes('.stage.done::after'), 'living UI should animate completed stages');
+assert.ok(css.includes('.resume-empty-state__spark'), 'living UI should include empty state illustration animation');
 assert.ok(app.includes('initLivingUI'), 'app should initialize living UI behavior');
+assert.ok(app.includes('function setEmptyStateVisible'), 'app should control empty state visibility');
+assert.ok(app.includes('setEmptyStateVisible(false)'), 'app should hide empty state during generation');
+assert.ok(app.includes('setEmptyStateVisible(true)'), 'app should restore empty state on start-over');
 
 console.log('living UI tests passed');

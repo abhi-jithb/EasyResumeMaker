@@ -150,6 +150,11 @@
       }
     }
 
+    function setEmptyStateVisible(visible) {
+      const empty = document.getElementById('resume-empty-state');
+      if (empty) empty.hidden = !visible;
+    }
+
     function getFriendlyApiError(error) {
       return window.EasyResumeErrors.apiErrorMessage(error);
     }
@@ -167,6 +172,7 @@
       });
       hideError();
       hideResumeRunner();
+      setEmptyStateVisible(false);
 
       const fullUrl = normalizedUrl.url;
 
@@ -965,6 +971,7 @@
       document.getElementById('stages').style.display = 'none';
       hideError();
       hideResumeRunner();
+      setEmptyStateVisible(true);
       setCopyButtonState('idle');
       resumeData = null;
       window.scrollTo({ top: 0, behavior: 'smooth' });
