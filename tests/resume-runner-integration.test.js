@@ -18,8 +18,18 @@ assert.ok(offline.includes('Resume Runner'), 'offline page should include Resume
 assert.ok(offline.includes('window.location.reload()'), 'offline page should include retry action');
 assert.ok(offline.includes('assets/js/resume-runner.js'), 'offline page should reuse runner module');
 
-assert.ok(notFound.includes('Lost Resume Mode'), '404 page should use playful not-found messaging');
+assert.ok(notFound.includes('404 - Your Resume Took a Wrong Turn'), '404 page should use the custom wrong-turn title');
+assert.ok(notFound.includes('We searched GitHub, portfolios, blogs, and recruiter inboxes.'), '404 page should include required description');
 assert.ok(notFound.includes('Generate Resume'), '404 page should link to resume generation');
-assert.ok(notFound.includes('assets/js/resume-runner.js'), '404 page should reuse runner module');
+assert.ok(notFound.includes('<svg'), '404 page should include an SVG illustration');
+assert.ok(notFound.includes('resume-run'), '404 page should include animated resume character');
+assert.ok(notFound.includes('ats-bot'), '404 page should include ATS robot');
+assert.ok(notFound.includes('404 link'), '404 page should include broken link sign');
+assert.ok(notFound.includes('Interview'), '404 page should include interview room door');
+assert.ok(notFound.includes('steam'), '404 page should include coffee steam');
+assert.ok(notFound.includes('prefers-reduced-motion'), '404 page should respect reduced motion');
+assert.ok(notFound.includes('pointermove'), '404 page should include cursor parallax');
+assert.ok(notFound.includes('messages = ['), '404 page should rotate status messages');
+assert.ok(notFound.includes('ATS bot says'), '404 page should include ATS bot easter egg');
 
 console.log('resume runner integration tests passed');
