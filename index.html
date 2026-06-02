@@ -231,53 +231,49 @@
 
     <div class="stages" id="stages" aria-live="polite">
 
-      <div class="stage waiting" id="stage-fetch">
+      <div class="stage waiting" id="stage-fetch" data-flow="fetching">
         <div class="stage-header">
           <div class="stage-icon">🌐</div>
           <div class="stage-name">Fetching your page</div>
           <div class="stage-status" aria-live="polite">waiting</div>
         </div>
-        <div class="stage-desc">Reading every word, project, and skill from your public URL using Jina Reader API —
-          works even on JavaScript-heavy sites.</div>
+        <div class="stage-desc">Reading every corner of your profile and looking for project gems.</div>
         <div class="load-bar" aria-hidden="true">
           <div class="load-fill"></div>
         </div>
       </div>
 
-      <div class="stage waiting" id="stage-parse">
+      <div class="stage waiting" id="stage-parse" data-flow="extracting">
         <div class="stage-header">
           <div class="stage-icon">🧠</div>
           <div class="stage-name">Extracting your story</div>
           <div class="stage-status" aria-live="polite">waiting</div>
         </div>
-        <div class="stage-desc">AI reads the raw content and identifies your name, roles, skills, education, projects,
-          and contact details — without making anything up.</div>
+        <div class="stage-desc">Connecting the dots across roles, skills, education, projects, and contact details.</div>
         <div class="load-bar" aria-hidden="true">
           <div class="load-fill"></div>
         </div>
       </div>
 
-      <div class="stage waiting" id="stage-build">
+      <div class="stage waiting" id="stage-build" data-flow="writing">
         <div class="stage-header">
           <div class="stage-icon">✍️</div>
           <div class="stage-name">Writing your resume</div>
           <div class="stage-status" aria-live="polite">waiting</div>
         </div>
-        <div class="stage-desc">Crafting polished, professional resume copy from your extracted data — proper verbs,
-          concise bullets, and a strong summary.</div>
+        <div class="stage-desc">Teaching your resume to speak recruiter with concise, evidence-based bullets.</div>
         <div class="load-bar" aria-hidden="true">
           <div class="load-fill"></div>
         </div>
       </div>
 
-      <div class="stage waiting" id="stage-pdf">
+      <div class="stage waiting" id="stage-pdf" data-flow="exporting">
         <div class="stage-header">
           <div class="stage-icon">📄</div>
           <div class="stage-name">Typesetting PDF</div>
           <div class="stage-status" aria-live="polite">waiting</div>
         </div>
-        <div class="stage-desc">Laying out your resume in your chosen template with beautiful typography, perfect
-          margins, and ATS-friendly formatting.</div>
+        <div class="stage-desc">Typesetting the final preview with clean spacing and ATS-friendly structure.</div>
         <div class="load-bar" aria-hidden="true">
           <div class="load-fill"></div>
         </div>

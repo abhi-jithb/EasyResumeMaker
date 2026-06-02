@@ -25,6 +25,12 @@ assert.ok(css.includes('living-success-sweep'), 'living UI should include succes
 assert.ok(css.includes('.btn-dl:hover'), 'living UI should include button hover microinteractions');
 assert.ok(css.includes('.stage.done::after'), 'living UI should animate completed stages');
 assert.ok(css.includes('.resume-empty-state__spark'), 'living UI should include empty state illustration animation');
+assert.ok(html.includes('data-flow="fetching"'), 'fetching stage should have living flow identity');
+assert.ok(html.includes('data-flow="extracting"'), 'extracting stage should have living flow identity');
+assert.ok(html.includes('data-flow="writing"'), 'writing stage should have living flow identity');
+assert.ok(html.includes('data-flow="exporting"'), 'exporting stage should have living flow identity');
+assert.ok(css.includes('living-flow-scan'), 'living UI should animate active generation flow');
+assert.ok(css.includes('living-flow-ping'), 'living UI should animate active stage icon');
 assert.ok(app.includes('initLivingUI'), 'app should initialize living UI behavior');
 assert.ok(app.includes('function setEmptyStateVisible'), 'app should control empty state visibility');
 assert.ok(app.includes('setEmptyStateVisible(false)'), 'app should hide empty state during generation');

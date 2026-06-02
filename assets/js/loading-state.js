@@ -9,9 +9,9 @@
 })(typeof window !== 'undefined' ? window : globalThis, function () {
   const LABELS = {
     idle: 'Generate ->',
-    fetch: 'Reading URL...',
-    parse: 'Extracting...',
-    build: 'Writing...',
+    fetch: 'Reading profile...',
+    parse: 'Connecting dots...',
+    build: 'Writing bullets...',
     pdf: 'Preparing preview...'
   };
 

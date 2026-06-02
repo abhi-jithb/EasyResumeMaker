@@ -2,9 +2,9 @@ const assert = require('assert');
 const { getGenerateButtonLabel } = require('../assets/js/loading-state');
 
 assert.equal(getGenerateButtonLabel('idle'), 'Generate ->');
-assert.equal(getGenerateButtonLabel('fetch'), 'Reading URL...');
-assert.equal(getGenerateButtonLabel('parse'), 'Extracting...');
-assert.equal(getGenerateButtonLabel('build'), 'Writing...');
+assert.equal(getGenerateButtonLabel('fetch'), 'Reading profile...');
+assert.equal(getGenerateButtonLabel('parse'), 'Connecting dots...');
+assert.equal(getGenerateButtonLabel('build'), 'Writing bullets...');
 assert.equal(getGenerateButtonLabel('pdf'), 'Preparing preview...');
 assert.equal(getGenerateButtonLabel('unknown'), 'Generate ->');
 
