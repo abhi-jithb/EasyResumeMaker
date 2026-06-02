@@ -48,14 +48,14 @@
 
 <body>
   <div class="living-bg" aria-hidden="true">
-    <span class="living-bg__item living-bg__page"></span>
-    <span class="living-bg__item living-bg__card"></span>
-    <span class="living-bg__item living-bg__dot"></span>
-    <span class="living-bg__item living-bg__page"></span>
-    <span class="living-bg__item living-bg__star">✦</span>
-    <span class="living-bg__item living-bg__dot"></span>
-    <span class="living-bg__item living-bg__star">✧</span>
-    <span class="living-bg__item living-bg__card"></span>
+    <span class="living-bg__item living-bg__page" data-depth="18"></span>
+    <span class="living-bg__item living-bg__card" data-depth="-14"></span>
+    <span class="living-bg__item living-bg__dot" data-depth="10"></span>
+    <span class="living-bg__item living-bg__page" data-depth="-20"></span>
+    <span class="living-bg__item living-bg__star" data-depth="12">✦</span>
+    <span class="living-bg__item living-bg__dot" data-depth="-8"></span>
+    <span class="living-bg__item living-bg__star" data-depth="16">✧</span>
+    <span class="living-bg__item living-bg__card" data-depth="-12"></span>
   </div>
 
   <div class="wrap">
@@ -113,7 +113,7 @@
       <div class="section-label">Step 1 — Choose a template</div>
       <div class="template-grid" role="radiogroup" aria-label="Resume template">
 
-        <div class="tpl selected" data-tpl="minimal" onclick="selectTemplate(this)" role="radio" aria-checked="true"
+        <div class="tpl selected" data-tpl="minimal" data-tilt onclick="selectTemplate(this)" role="radio" aria-checked="true"
           tabindex="0">
           <div class="tpl-preview">
             <div class="tpl-line h"></div>
@@ -127,7 +127,7 @@
           <div class="tpl-desc">Clean · Pure white · Serif headings</div>
         </div>
 
-        <div class="tpl" data-tpl="modern" onclick="selectTemplate(this)" role="radio" aria-checked="false"
+        <div class="tpl" data-tpl="modern" data-tilt onclick="selectTemplate(this)" role="radio" aria-checked="false"
           tabindex="0">
           <div class="tpl-preview" style="background:#111827;flex-direction:row;gap:6px;padding:6px">
             <div
@@ -146,7 +146,7 @@
           <div class="tpl-desc">Two-column · Dark sidebar · Bold</div>
         </div>
 
-        <div class="tpl" data-tpl="classic" onclick="selectTemplate(this)" role="radio" aria-checked="false"
+        <div class="tpl" data-tpl="classic" data-tilt onclick="selectTemplate(this)" role="radio" aria-checked="false"
           tabindex="0">
           <div class="tpl-preview" style="background:#fff8f5;border-left:3px solid #ff6b47;padding-left:10px">
             <div class="tpl-line h" style="background:#333;width:55%"></div>
@@ -159,7 +159,7 @@
           <div class="tpl-desc">Traditional · Warm accent · Timeless</div>
         </div>
 
-        <div class="tpl" data-tpl="compact" onclick="selectTemplate(this)" role="radio" aria-checked="false"
+        <div class="tpl" data-tpl="compact" data-tilt onclick="selectTemplate(this)" role="radio" aria-checked="false"
           tabindex="0">
           <div class="tpl-preview" style="background:#fff;padding:7px;gap:2px">
             <div class="tpl-line h" style="background:#222;width:45%;height:4px"></div>
@@ -397,6 +397,7 @@
   <script src="assets/js/pdf-utils.js"></script>
   <script src="assets/js/pdf-generator.js"></script>
   <script src="assets/js/resume-runner.js"></script>
+  <script src="assets/js/living-ui.js"></script>
   <script src="assets/js/app.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
 </body>

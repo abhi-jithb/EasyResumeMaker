@@ -1047,3 +1047,7 @@
       const m = document.getElementById('feedback-modal');
       m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
     }
+
+    if (window.EasyResumeLivingUI) {
+      window.EasyResumeLivingUI.initLivingUI(document);
+    }

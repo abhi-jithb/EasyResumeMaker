@@ -10,7 +10,7 @@
 .living-bg__item {
   opacity: .18;
   position: absolute;
-  transform: translate3d(0, 0, 0);
+  transform: translate3d(var(--living-x, 0), var(--living-y, 0), 0);
   will-change: transform;
 }
 
@@ -73,6 +73,16 @@
   width: 5px;
 }
 
+[data-tilt] {
+  transform: perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transform-style: preserve-3d;
+  transition: transform .18s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease;
+}
+
+[data-tilt]:hover {
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .12);
+}
+
 .living-bg__item:nth-child(1) {
   animation: living-float-a 18s ease-in-out infinite;
   left: 7%;
@@ -122,29 +132,33 @@
 }
 
 @keyframes living-float-a {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(-4deg); }
-  50% { transform: translate3d(10px, -18px, 0) rotate(3deg); }
+  0%, 100% { transform: translate3d(var(--living-x, 0), var(--living-y, 0), 0) rotate(-4deg); }
+  50% { transform: translate3d(calc(var(--living-x, 0) + 10px), calc(var(--living-y, 0) - 18px), 0) rotate(3deg); }
 }
 
 @keyframes living-float-b {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(5deg); }
-  50% { transform: translate3d(-14px, 16px, 0) rotate(-2deg); }
+  0%, 100% { transform: translate3d(var(--living-x, 0), var(--living-y, 0), 0) rotate(5deg); }
+  50% { transform: translate3d(calc(var(--living-x, 0) - 14px), calc(var(--living-y, 0) + 16px), 0) rotate(-2deg); }
 }
 
 @keyframes living-float-c {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(2deg); }
-  50% { transform: translate3d(18px, 10px, 0) rotate(6deg); }
+  0%, 100% { transform: translate3d(var(--living-x, 0), var(--living-y, 0), 0) rotate(2deg); }
+  50% { transform: translate3d(calc(var(--living-x, 0) + 18px), calc(var(--living-y, 0) + 10px), 0) rotate(6deg); }
 }
 
 @keyframes living-drift {
-  0%, 100% { transform: translate3d(0, 0, 0); opacity: .12; }
-  50% { transform: translate3d(0, -22px, 0); opacity: .28; }
+  0%, 100% { transform: translate3d(var(--living-x, 0), var(--living-y, 0), 0); opacity: .12; }
+  50% { transform: translate3d(var(--living-x, 0), calc(var(--living-y, 0) - 22px), 0); opacity: .28; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .living-bg__item {
     animation: none;
     will-change: auto;
+  }
+
+  [data-tilt] {
+    transform: none !important;
   }
 }
 
