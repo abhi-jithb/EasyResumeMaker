@@ -18,6 +18,10 @@ assert.ok(css.includes('pointer-events: none'), 'living background should not bl
 assert.ok(css.includes('@media (prefers-reduced-motion: reduce)'), 'living UI should respect reduced motion');
 assert.ok(css.includes('will-change: transform'), 'animated elements should be GPU-friendly');
 assert.ok(css.includes('[data-tilt]'), 'living UI should include tilt styles');
+assert.ok(css.includes('living-rise'), 'living UI should include card rise animation');
+assert.ok(css.includes('living-success-sweep'), 'living UI should include success state animation');
+assert.ok(css.includes('.btn-dl:hover'), 'living UI should include button hover microinteractions');
+assert.ok(css.includes('.stage.done::after'), 'living UI should animate completed stages');
 assert.ok(app.includes('initLivingUI'), 'app should initialize living UI behavior');
 
 console.log('living UI tests passed');
