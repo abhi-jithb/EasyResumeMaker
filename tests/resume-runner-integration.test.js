@@ -39,6 +39,10 @@ assert.ok(notFound.includes('id="themeToggle404"'), '404 page should include a t
 assert.ok(notFound.includes("localStorage.getItem('theme')"), '404 page should reuse saved theme preference');
 assert.ok(notFound.includes('Switch to dark theme'), '404 theme toggle should expose state to assistive tech');
 assert.ok(notFound.includes('pointermove'), '404 page should include cursor parallax');
+assert.ok(notFound.includes('progress-route'), '404 page should animate the route toward the interview');
+assert.ok(notFound.includes('@keyframes route-flow'), '404 route animation should be CSS-only');
+assert.ok(notFound.includes('interview-door'), '404 page should animate the interview door');
+assert.ok(notFound.includes('broken-sign'), '404 page should animate the broken link sign');
 assert.ok(notFound.includes('messages = ['), '404 page should rotate status messages');
 assert.ok(notFound.includes('ATS bot says'), '404 page should include ATS bot easter egg');
 

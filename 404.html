@@ -256,6 +256,21 @@
       transform-origin: center;
     }
 
+    .progress-route {
+      animation: route-flow 1.8s linear infinite;
+      stroke-dasharray: 10 12;
+    }
+
+    .interview-door {
+      animation: door-glow 3.6s ease-in-out infinite;
+    }
+
+    .broken-sign {
+      animation: sign-wobble 5s ease-in-out infinite;
+      transform-box: fill-box;
+      transform-origin: center bottom;
+    }
+
     .steam path {
       animation: steam-rise 2.6s ease-in-out infinite;
       opacity: .45;
@@ -274,6 +289,10 @@
       fill: var(--accent2);
     }
 
+    .scene-card:hover .resume-run {
+      animation-duration: .82s;
+    }
+
     .ats-note {
       color: var(--txt3);
       font-family: 'DM Mono', monospace;
@@ -290,6 +309,23 @@
     @keyframes resume-bob {
       0%, 100% { transform: translate3d(0, 0, 0) rotate(-2deg); }
       50% { transform: translate3d(0, -7px, 0) rotate(2deg); }
+    }
+
+    @keyframes route-flow {
+      to { stroke-dashoffset: -22; }
+    }
+
+    @keyframes door-glow {
+      0%, 100% { opacity: .82; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes sign-wobble {
+      0%, 100% { transform: rotate(0); }
+      48% { transform: rotate(0); }
+      52% { transform: rotate(-1.8deg); }
+      56% { transform: rotate(1.2deg); }
+      60% { transform: rotate(0); }
     }
 
     @keyframes steam-rise {
@@ -430,6 +466,7 @@
 
             <rect width="720" height="520" rx="22" fill="#171720" />
             <path d="M40 424 H680" stroke="#2a2a35" stroke-width="4" stroke-linecap="round" />
+            <path class="progress-route" d="M114 420 C236 394 336 438 474 404 C548 386 600 392 650 380" fill="none" stroke="#47ffb2" stroke-width="3" stroke-linecap="round" opacity=".55" />
             <path d="M74 455 C170 431 260 474 365 448 C486 418 574 438 650 420" fill="none" stroke="#2a2a35" stroke-width="2" opacity=".7" />
 
             <g class="float-slower" transform="translate(78 78)">
@@ -444,14 +481,14 @@
             </g>
 
             <g class="float-soft" transform="translate(500 250)">
-              <rect x="0" y="0" width="112" height="174" rx="8" fill="url(#doorGrad)" stroke="#47ffb2" stroke-width="2" />
+              <rect class="interview-door" x="0" y="0" width="112" height="174" rx="8" fill="url(#doorGrad)" stroke="#47ffb2" stroke-width="2" />
               <rect x="18" y="22" width="76" height="20" rx="3" fill="#47ffb2" opacity=".16" />
               <text x="56" y="36" text-anchor="middle" fill="#47ffb2" font-family="DM Mono, monospace" font-size="10">Interview</text>
               <circle cx="91" cy="93" r="5" fill="#e8ff47" />
               <path d="M20 424 H630" stroke="#47ffb2" stroke-width="2" opacity=".35" />
             </g>
 
-            <g transform="translate(66 304)">
+            <g class="broken-sign" transform="translate(66 304)">
               <rect x="0" y="0" width="118" height="52" rx="8" fill="#20202b" stroke="#ff6b47" stroke-width="2" />
               <path d="M22 38 L96 14" stroke="#ff6b47" stroke-width="5" stroke-linecap="round" />
               <text x="59" y="32" text-anchor="middle" fill="#f0ede8" font-family="DM Mono, monospace" font-size="12">404 link</text>
