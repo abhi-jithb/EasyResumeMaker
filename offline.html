@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline | EasyResume Maker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/resume-runner.css">
+</head>
+
+<body>
+  <main class="wrap">
+    <nav>
+      <div class="logo">Easy<span>Resume</span> Maker</div>
+      <a class="badge" href="index.html">Go Home</a>
+    </nav>
+
+    <section class="hero">
+      <div class="eyebrow">Offline mode</div>
+      <h1>Internet not found.<br><em>Resume still running.</em></h1>
+      <p class="sub">Your WiFi is taking a coffee break. Help your resume reach the interview while the connection comes back.</p>
+    </section>
+
+    <div id="resume-runner-host"></div>
+
+    <div class="btn-row">
+      <button class="btn-dl" onclick="window.location.reload()">Retry</button>
+      <a class="btn-new" href="index.html">Go Home</a>
+    </div>
+  </main>
+
+  <script src="assets/js/resume-runner.js"></script>
+  <script>
+    window.EasyResumeRunner.createResumeRunner(document.getElementById('resume-runner-host'), {
+      title: 'Resume Runner',
+      message: 'Your internet is taking a break. Help your resume reach the interview.'
+    });
+  </script>
+</body>
+
+</html>

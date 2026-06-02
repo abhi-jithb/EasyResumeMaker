@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Not Found | EasyResume Maker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/resume-runner.css">
+</head>
+
+<body>
+  <main class="wrap">
+    <nav>
+      <div class="logo">Easy<span>Resume</span> Maker</div>
+      <a class="badge" href="index.html">Go Home</a>
+    </nav>
+
+    <section class="hero">
+      <div class="eyebrow">Lost Resume Mode</div>
+      <h1>Lost Resume Mode<br><em>Activated.</em></h1>
+      <p class="sub">We searched every repository but could not find this page. You can head home or launch Resume Runner.</p>
+    </section>
+
+    <div id="resume-runner-host"></div>
+
+    <div class="btn-row">
+      <a class="btn-dl" href="index.html#url-input">Generate Resume</a>
+      <a class="btn-new" href="index.html">Go Home</a>
+    </div>
+  </main>
+
+  <script src="assets/js/resume-runner.js"></script>
+  <script>
+    window.EasyResumeRunner.createResumeRunner(document.getElementById('resume-runner-host'), {
+      title: 'Resume Runner',
+      message: 'This page wandered off. Help your resume reach the interview instead.'
+    });
+  </script>
+</body>
+
+</html>

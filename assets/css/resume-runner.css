@@ -6,6 +6,10 @@
   padding: 16px;
 }
 
+.runner-host {
+  margin: 18px 0 0;
+}
+
 .resume-runner__header {
   display: flex;
   align-items: flex-start;

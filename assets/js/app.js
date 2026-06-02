@@ -126,6 +126,30 @@
       document.getElementById('error-box').style.display = 'none';
     }
 
+    let resumeRunnerInstance = null;
+
+    function showResumeRunner(message) {
+      const host = document.getElementById('resume-runner-host');
+      if (!host || !window.EasyResumeRunner) return;
+      host.hidden = false;
+      if (!resumeRunnerInstance) {
+        resumeRunnerInstance = window.EasyResumeRunner.createResumeRunner(host, {
+          title: 'Resume Runner',
+          message: message || 'Your internet is taking a break. Help your resume reach the interview.'
+        });
+      }
+    }
+
+    function hideResumeRunner() {
+      const host = document.getElementById('resume-runner-host');
+      if (!host) return;
+      host.hidden = true;
+      if (resumeRunnerInstance) {
+        resumeRunnerInstance.destroy();
+        resumeRunnerInstance = null;
+      }
+    }
+
     function getFriendlyApiError(error) {
       return window.EasyResumeErrors.apiErrorMessage(error);
     }
@@ -142,6 +166,7 @@
         source_type: source.type
       });
       hideError();
+      hideResumeRunner();
 
       const fullUrl = normalizedUrl.url;
 
@@ -165,6 +190,7 @@
         setStage('stage-fetch', 'waiting', 'failed ✗');
         window.EasyResumeAnalytics.track('generate_failed', { stage: 'fetch', error_code: 'fetch_failed', source_type: source.type });
         showError(window.EasyResumeErrors.fetchErrorMessage(e));
+        showResumeRunner('Your internet is taking a break. Help your resume reach the interview while we wait.');
         setGenerateButtonState('idle');
         return;
       }
@@ -938,6 +964,7 @@
       document.getElementById('result-section').style.display = 'none';
       document.getElementById('stages').style.display = 'none';
       hideError();
+      hideResumeRunner();
       setCopyButtonState('idle');
       resumeData = null;
       window.scrollTo({ top: 0, behavior: 'smooth' });
