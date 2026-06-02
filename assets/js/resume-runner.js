@@ -93,6 +93,13 @@
       this.startButton.textContent = 'Start run';
       this.startButton.addEventListener('click', () => this.start());
 
+      this.jumpButton = doc.createElement('button');
+      this.jumpButton.type = 'button';
+      this.jumpButton.className = 'resume-runner__button';
+      this.jumpButton.textContent = 'Jump';
+      this.jumpButton.setAttribute('aria-label', 'Jump over the next obstacle');
+      this.jumpButton.addEventListener('click', () => this.jump());
+
       this.pauseButton = doc.createElement('button');
       this.pauseButton.type = 'button';
       this.pauseButton.className = 'resume-runner__button secondary';
@@ -105,7 +112,7 @@
       this.restartButton.textContent = 'Restart';
       this.restartButton.addEventListener('click', () => this.restart());
 
-      this.actions.append(this.startButton, this.pauseButton, this.restartButton);
+      this.actions.append(this.startButton, this.jumpButton, this.pauseButton, this.restartButton);
       this.el.append(header, this.canvas, this.actions);
       this.target.append(this.el);
     }
@@ -116,7 +123,10 @@
         event.preventDefault();
         this.jump();
       };
-      this.onPointerDown = () => this.jump();
+      this.onPointerDown = (event) => {
+        if (event && event.preventDefault) event.preventDefault();
+        this.jump();
+      };
 
       const doc = this.target.ownerDocument || root.document;
       if (doc && doc.addEventListener) doc.addEventListener('keydown', this.onKeyDown);

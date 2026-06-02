@@ -85,7 +85,10 @@ assert.equal(runner.player.height, 46);
 assert.equal(runner.player.y, runner.groundY - runner.player.height);
 assert.equal(runner.obstacleTypes.length, 4);
 assert.deepEqual(runner.obstacleTypes.map(item => item.type), ['ats', 'link', 'deadline', 'error']);
+assert.equal(runner.jumpButton.textContent, 'Jump');
+assert.equal(runner.jumpButton.attributes['aria-label'], 'Jump over the next obstacle');
 assert.equal(typeof runner.canvas.onpointerdown, 'function');
+assert.equal(typeof runner.canvas.ontouchstart, 'function');
 assert.equal(typeof documentStub.listeners.keydown, 'function');
 
 assert.equal(runner.jump(), true);

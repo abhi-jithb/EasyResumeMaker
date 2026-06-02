@@ -69,3 +69,24 @@
   border: 1px solid var(--border, #2a2a35);
   color: var(--txt, #f0ede8);
 }
+
+@media (max-width: 560px) {
+  .resume-runner {
+    padding: 12px;
+  }
+
+  .resume-runner__header {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .resume-runner__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .resume-runner__button {
+    min-height: 44px;
+    width: 100%;
+  }
+}
