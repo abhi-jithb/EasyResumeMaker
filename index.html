@@ -1928,8 +1928,30 @@ ${rawText}`;
         // Parse JSON — strip any accidental fences
         const clean = aiText.replace(/```json|```/g, '').trim();
         parsed = JSON.parse(clean);
-        resumeData = parsed;
-        setStage('stage-parse', 'done', 'done ✓');
+
+        // ── VALIDATION ──
+        console.log('[EasyResume] Parsed data:', parsed);
+
+        const hasName = typeof parsed.name === 'string' && parsed.name.trim().length > 0;
+        const hasExperience = Array.isArray(parsed.experience) && parsed.experience.some(e => e.role || e.organization);
+        const hasSkills = parsed.skills && (
+        (parsed.skills.languages && parsed.skills.languages.length > 0) ||
+        (parsed.skills.tools && parsed.skills.tools.length > 0)
+        );
+        const hasEducation = Array.isArray(parsed.education) && parsed.education.some(e => e.degree || e.institution);
+
+        if (!hasName && !hasExperience && !hasSkills && !hasEducation) {
+        setStage('stage-parse', 'waiting', 'failed ✗');
+        showError(
+        'We couldn\'t extract enough information from that page. ' +
+        'Try a URL with more text content — like a GitHub profile, dev.to, or read.cv page.'
+        );
+        document.getElementById('go-btn').disabled = false;
+        return;
+      }
+
+      resumeData = parsed;
+      setStage('stage-parse', 'done', 'done ✓');
 
       } catch (e) {
         setStage('stage-parse', 'waiting', 'failed ✗');
@@ -1946,6 +1968,8 @@ ${rawText}`;
       // ── STAGE 4: TYPESET ──
       setStage('stage-pdf', 'active', 'typesetting...');
       await delay(600);
+      console.log('[EasyResume] Rendering preview with:', parsed);
+      renderPreview(parsed);
       renderPreview(parsed);
       setStage('stage-pdf', 'done', 'done ✓');
 
@@ -2175,7 +2199,25 @@ ${rawText}`;
 
     // ===== PDF DOWNLOAD =====
     function downloadPDF() {
-      if (!resumeData) return;
+      if (!resumeData) {
+      showError('No resume data found. Please generate a resume first.');
+      return;
+      }
+
+      const hasName = typeof resumeData.name === 'string' && resumeData.name.trim().length > 0;
+      const hasExperience = Array.isArray(resumeData.experience) && resumeData.experience.some(e => e.role || e.organization);
+      const hasSkills = resumeData.skills && (
+      (resumeData.skills.languages && resumeData.skills.languages.length > 0) ||
+      (resumeData.skills.tools && resumeData.skills.tools.length > 0)
+      );
+      const hasEducation = Array.isArray(resumeData.education) && resumeData.education.some(e => e.degree || e.institution);
+
+      if (!hasName && !hasExperience && !hasSkills && !hasEducation) {
+      showError('The resume is empty — nothing to download. Try a different URL with more content.');
+      return;
+      }
+
+      console.log('[EasyResume] Downloading PDF for:', resumeData.name);
       const d = resumeData;
       const tpl = selectedTemplate;
       const { jsPDF } = window.jspdf;
