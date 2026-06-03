@@ -1481,7 +1481,21 @@
     </div>
 
     <div style="margin:20px 0 0">
-      <div class="section-label">Step 3 — Your public URL</div>
+      <div class="section-label" style="display:flex;align-items:center;gap:8px;">
+  Step 3 — Your public URL
+  <div class="url-tooltip-wrap" style="position:relative;display:inline-flex;">
+    <button class="url-help-btn" aria-label="What URL should I use?" aria-expanded="false" style="width:18px;height:18px;border-radius:50%;border:1.5px solid currentColor;background:transparent;cursor:pointer;font-size:11px;font-weight:700;color:inherit;display:inline-flex;align-items:center;justify-content:center;padding:0;opacity:0.6;">?</button>
+    <div class="url-tooltip-pop" role="tooltip" hidden style="position:absolute;top:26px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;width:240px;font-size:0.8rem;line-height:1.6;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.15);">
+      <div style="font-weight:600;margin-bottom:8px;font-size:0.82rem;">What URL should I use?</div>
+      <div>✅ GitHub profile</div>
+      <div>✅ Dev.to profile</div>
+      <div>✅ Read.cv</div>
+      <div>✅ Portfolio site</div>
+      <div>⚠️ LinkedIn (partial)</div>
+      <div>❌ Private / login-required pages</div>
+    </div>
+  </div>
+</div>
       <div class="url-box" role="search">
         <div class="url-inner">
           <span class="url-prefix" aria-hidden="true">https://</span>
@@ -1914,8 +1928,30 @@ ${rawText}`;
         // Parse JSON — strip any accidental fences
         const clean = aiText.replace(/```json|```/g, '').trim();
         parsed = JSON.parse(clean);
-        resumeData = parsed;
-        setStage('stage-parse', 'done', 'done ✓');
+
+        // ── VALIDATION ──
+        console.log('[EasyResume] Parsed data:', parsed);
+
+        const hasName = typeof parsed.name === 'string' && parsed.name.trim().length > 0;
+        const hasExperience = Array.isArray(parsed.experience) && parsed.experience.some(e => e.role || e.organization);
+        const hasSkills = parsed.skills && (
+        (parsed.skills.languages && parsed.skills.languages.length > 0) ||
+        (parsed.skills.tools && parsed.skills.tools.length > 0)
+        );
+        const hasEducation = Array.isArray(parsed.education) && parsed.education.some(e => e.degree || e.institution);
+
+        if (!hasName && !hasExperience && !hasSkills && !hasEducation) {
+        setStage('stage-parse', 'waiting', 'failed ✗');
+        showError(
+        'We couldn\'t extract enough information from that page. ' +
+        'Try a URL with more text content — like a GitHub profile, dev.to, or read.cv page.'
+        );
+        document.getElementById('go-btn').disabled = false;
+        return;
+      }
+
+      resumeData = parsed;
+      setStage('stage-parse', 'done', 'done ✓');
 
       } catch (e) {
         setStage('stage-parse', 'waiting', 'failed ✗');
@@ -1932,6 +1968,8 @@ ${rawText}`;
       // ── STAGE 4: TYPESET ──
       setStage('stage-pdf', 'active', 'typesetting...');
       await delay(600);
+      console.log('[EasyResume] Rendering preview with:', parsed);
+      renderPreview(parsed);
       renderPreview(parsed);
       setStage('stage-pdf', 'done', 'done ✓');
 
@@ -2161,7 +2199,25 @@ ${rawText}`;
 
     // ===== PDF DOWNLOAD =====
     function downloadPDF() {
-      if (!resumeData) return;
+      if (!resumeData) {
+      showError('No resume data found. Please generate a resume first.');
+      return;
+      }
+
+      const hasName = typeof resumeData.name === 'string' && resumeData.name.trim().length > 0;
+      const hasExperience = Array.isArray(resumeData.experience) && resumeData.experience.some(e => e.role || e.organization);
+      const hasSkills = resumeData.skills && (
+      (resumeData.skills.languages && resumeData.skills.languages.length > 0) ||
+      (resumeData.skills.tools && resumeData.skills.tools.length > 0)
+      );
+      const hasEducation = Array.isArray(resumeData.education) && resumeData.education.some(e => e.degree || e.institution);
+
+      if (!hasName && !hasExperience && !hasSkills && !hasEducation) {
+      showError('The resume is empty — nothing to download. Try a different URL with more content.');
+      return;
+      }
+
+      console.log('[EasyResume] Downloading PDF for:', resumeData.name);
       const d = resumeData;
       const tpl = selectedTemplate;
       const { jsPDF } = window.jspdf;
@@ -2577,6 +2633,38 @@ ${rawText}`;
       const m = document.getElementById('feedback-modal');
       m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
     }
+    // URL tooltip
+(function(){
+  const btn = document.querySelector('.url-help-btn');
+  const pop = document.querySelector('.url-tooltip-pop');
+  if(!btn || !pop) return;
+
+  function open(){
+    pop.hidden = false;
+    btn.setAttribute('aria-expanded','true');
+  }
+  function close(){
+    pop.hidden = true;
+    btn.setAttribute('aria-expanded','false');
+  }
+
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    pop.hidden ? open() : close();
+  });
+
+  document.addEventListener('click', function(){
+    close();
+  });
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') close();
+  });
+
+  pop.addEventListener('click', function(e){
+    e.stopPropagation();
+  });
+})();
   </script>
 
   <script defer src="/_vercel/insights/script.js"></script>
