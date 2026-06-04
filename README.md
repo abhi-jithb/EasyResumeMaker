@@ -6,7 +6,7 @@
 Paste any public URL — portfolio site, GitHub profile, LinkedIn, Dev.to, 
 or personal blog — and get a clean, downloadable PDF resume in seconds.
 
-3 templates · Groq AI (Gemini soon) · 100% client-side · FeedBack system · No data collected
+*3 templates · Groq AI & Gemini AI · 100% client-side · FeedBack system · No data collected*
 
 ---
 
@@ -78,8 +78,10 @@ Push to a repo, enable GitHub Pages from Settings → Pages → main branch.
 
 Groq's free tier allows hundreds of resume generations per day.
 
-### Gemini (Coming in Next Update)
-*Gemini integration is currently undergoing maintenance to support the latest v1 stable API. Groq is the recommended provider for now.*
+### Gemini
+1. Go to [aistudio.google.com](https://aistudio.google.com)
+2. Sign in and generate a free API key
+3. Copy and paste into EasyResume Maker
 
 ---
 
