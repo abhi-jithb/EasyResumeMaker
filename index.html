@@ -1420,7 +1420,8 @@
       <div class="api-row">
         <select class="api-select" id="provider-select" aria-label="Select AI provider">
           <option value="groq">⚡ Groq (Fastest)</option>
-          </select>
+          <option value="gemini">✨ Gemini 1.5 Flash</option>
+        </select>
         <input class="api-input" id="api-key-input" type="password" placeholder="Paste your API key here..."
           aria-label="API Key">
       </div>
@@ -2548,30 +2549,6 @@ ${rawText}`;
       if (!isCopyShortcut || !resumeData) return;
       e.preventDefault();
       copyResume();
-    });
-
-    // Gemini Coming Soon Handler
-    document.getElementById('provider-select').addEventListener('change', function () {
-      const isGemini = this.value === 'gemini';
-      const keyInput = document.getElementById('api-key-input');
-      const hint = document.querySelector('.key-hint');
-      const goBtn = document.getElementById('go-btn');
-
-      if (isGemini) {
-        keyInput.disabled = true;
-        keyInput.value = '';
-        keyInput.placeholder = 'Scheduled for next update...';
-        hint.innerHTML = '<span>✧ Gemini integration is coming soon. Please use Groq for now.</span>';
-        hint.style.color = 'var(--accent3)';
-        goBtn.disabled = true;
-        hideError();
-      } else {
-        keyInput.disabled = false;
-        keyInput.placeholder = 'Paste your API key here...';
-        hint.innerHTML = 'Your key stays in your browser — never sent to our servers.';
-        hint.style.color = 'var(--txt3)';
-        goBtn.disabled = false;
-      }
     });
 
     function toggleFeedback() {
